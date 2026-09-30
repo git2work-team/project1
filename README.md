@@ -1,3 +1,7 @@
+## Figma Storyboard Link
+
+https://www.figma.com/design/r69OzTUJHwbV4n88coYpSb/3100-Project?node-id=0-1&t=N1Dm5d8RDRSwiGb0-1
+
 ## Code Style and Quality Tools
 
 This project uses ESLint and Prettier to keep JavaScript and React code consistent across all team members.
