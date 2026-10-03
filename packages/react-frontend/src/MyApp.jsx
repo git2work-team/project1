@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import Table from "./Table"
+import React, { useState, useEffect } from "react";
+import Table from "./Table";
 import Form from "./Form";
 
 function MyApp() {
@@ -12,21 +12,20 @@ function MyApp() {
     setCharacters(updated);
   }
 
-
   //Initially get the Users from backend
   function fetchUsers() {
     const promise = fetch("http://localhost:8000/users");
     return promise;
   }
 
-  
   useEffect(() => {
     fetchUsers()
       .then((res) => res.json())
       .then((json) => setCharacters(json["users_list"]))
-      .catch((error) => { console.log(error); });
-  }, [] );
-
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   //Adds user, gets the input and adds to the list
   function postUser(review) {
@@ -66,17 +65,18 @@ function MyApp() {
     return promise;
   }
 
-  function updateDelete(id){
+  function updateDelete(id) {
     deleteUser(id)
       .then((response) => {
-          if (response.status === 200) {
-            setCharacters((prevCharacters) => 
-              prevCharacters.filter((character) => {
-                return character["_id"] !== id
-            }));
-          } else {
-            console.log("Deletion failed: status:", response.status);
-          }
+        if (response.status === 200) {
+          setCharacters((prevCharacters) =>
+            prevCharacters.filter((character) => {
+              return character["_id"] !== id;
+            })
+          );
+        } else {
+          console.log("Deletion failed: status:", response.status);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -84,13 +84,10 @@ function MyApp() {
   }
 
   return (
-        <div className="container">
-            <Table
-            characterData={characters}
-            removeCharacter={updateDelete}
-            />
-            <Form handleSubmit={updateList} />
-        </div>
-    );
+    <div className="container">
+      <Table characterData={characters} removeCharacter={updateDelete} />
+      <Form handleSubmit={updateList} />
+    </div>
+  );
 }
 export default MyApp;

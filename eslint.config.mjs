@@ -10,5 +10,11 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: { globals: globals.browser },
   },
+  {
+    files: ["packages/express-backend/**/*.js"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   pluginReact.configs.flat.recommended,
 ]);
