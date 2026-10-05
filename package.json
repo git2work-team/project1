@@ -31,5 +31,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "dotenv": "^18.0.5"
+  }
 }
