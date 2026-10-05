@@ -1,0 +1,189 @@
+/* Styles for the Want-to-Try list page (based on the Figma prototype) */
+
+.wtt-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.wtt-page h1 {
+  font-size: 2rem;
+  margin: 0 0 16px;
+}
+
+.wtt-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.wtt-pill,
+.wtt-btn {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.wtt-pill {
+  padding: 6px 18px;
+  border: 1px solid #bdbdbd;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1e1e1e;
+}
+
+.wtt-pill:hover,
+.wtt-pill:focus {
+  background: #f2f2f2;
+  border-color: #bdbdbd;
+  color: #1e1e1e;
+}
+
+.wtt-pill-active,
+.wtt-pill-active:hover,
+.wtt-pill-active:focus {
+  background: #f2994a;
+  border-color: #f2994a;
+  color: #ffffff;
+}
+
+.wtt-body {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.wtt-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wtt-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px;
+  border: 1px solid #6b7899;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.wtt-card-tried {
+  background: #f7f7f7;
+}
+
+.wtt-card-tried h3 {
+  text-decoration: line-through;
+  color: #7a7a7a;
+}
+
+.wtt-image {
+  width: 140px;
+  height: 90px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d9d9;
+  border-radius: 4px;
+  color: #5f5f5f;
+  font-size: 0.85rem;
+}
+
+.wtt-info {
+  flex: 1;
+}
+
+.wtt-info h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.wtt-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.wtt-tag-deal {
+  background: #fdebd3;
+  color: #8a4b08;
+}
+
+.wtt-tag-wait {
+  background: #fbe1e1;
+  color: #8c1d1d;
+}
+
+.wtt-tag-short {
+  background: #e3f4da;
+  color: #2e6b12;
+}
+
+.wtt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 140px;
+}
+
+.wtt-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.wtt-btn-orange,
+.wtt-btn-orange:hover,
+.wtt-btn-orange:focus {
+  background: #f2994a;
+  border: 1px solid #f2994a;
+  color: #ffffff;
+}
+
+.wtt-btn-outline,
+.wtt-btn-outline:hover,
+.wtt-btn-outline:focus {
+  background: #ffffff;
+  border: 1px solid #6b7899;
+  color: #1e1e1e;
+}
+
+.wtt-deals {
+  width: 300px;
+  padding: 16px;
+  border: 1px solid #6b7899;
+  border-radius: 4px;
+  background: #f2f2f2;
+}
+
+.wtt-deals h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.wtt-deal-row {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #ffffff;
+  font-size: 0.85rem;
+}
+
+.wtt-empty {
+  color: #6f6f6f;
+}
+
+@media (max-width: 800px) {
+  .wtt-body {
+    flex-direction: column;
+  }
+
+  .wtt-deals {
+    width: 100%;
+  }
+}
