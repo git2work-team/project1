@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
+import WantToTry from "./WantToTry";
 
 function MyApp() {
   const [characters, setCharacters] = useState([]);
+  // which page to show until we add real navigation: "reviews" or "wantToTry"
+  const [page, setPage] = useState("reviews");
 
   function removeOneCharacter(index) {
     const updated = characters.filter((character, i) => {
@@ -85,8 +88,16 @@ function MyApp() {
 
   return (
     <div className="container">
-      <Table characterData={characters} removeCharacter={updateDelete} />
-      <Form handleSubmit={updateList} />
+      <button onClick={() => setPage("reviews")}>Reviews</button>{" "}
+      <button onClick={() => setPage("wantToTry")}>Want-to-Try List</button>
+      {page === "wantToTry" ? (
+        <WantToTry />
+      ) : (
+        <>
+          <Table characterData={characters} removeCharacter={updateDelete} />
+          <Form handleSubmit={updateList} />
+        </>
+      )}
     </div>
   );
 }
