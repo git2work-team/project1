@@ -7,6 +7,6 @@ router.get("/", restaurantController.getRestaurants);
 router.get("/:id", restaurantController.getRestaurantById);
 router.post("/", restaurantController.createRestaurant);
 router.patch("/:id", restaurantController.updateRestaurant);
-router.delete(":/id", restaurantController.deleteRestaurant);
+router.delete("/:id", restaurantController.deleteRestaurant);
 
 export default router;

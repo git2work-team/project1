@@ -1,4 +1,4 @@
-import Restaurant from "../tables/restaurant";
+import Restaurant from "../tables/restaurant.js";
 
 async function createRestaurant(req, res) {
   const restaurant = await Restaurant.create(req.body);
