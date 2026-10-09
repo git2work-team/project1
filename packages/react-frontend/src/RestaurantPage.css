@@ -1,0 +1,64 @@
+.restaurantPage {
+  padding: 0 5%;
+}
+.restaurantFeatures {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.restaurantRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ratingAndPrice {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dietaryTags {
+  display: flex;
+  gap: 10px;
+}
+
+.restaurantHeader {
+  width: fit-content;
+  max-width: 100%;
+  text-align: left;
+  margin-right: 0;
+  margin-left: 14%;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.restaurantHeader p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.restaurantHeader h1,
+.restaurantHeader h1:not(:first-child) {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.restaurantHeader h1 {
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.photos {
+    height: 600px;
+    background-color: grey;
+}
+
+.restaurantDetails {
+    display: grid;
+}

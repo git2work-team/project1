@@ -30,7 +30,7 @@ function MyApp() {
   }
 
   return (
-    <div className="container">
+    <div className="full-container">
       <Navbar />
       {content}
     </div>
