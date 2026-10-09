@@ -4,7 +4,7 @@
   "type": "module",
   "main": "backend.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "dev": "nodemon --env-file=.env backend.js",
     "start": "node --env-file=.env backend.js"
   },
