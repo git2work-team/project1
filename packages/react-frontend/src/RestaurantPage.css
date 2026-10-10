@@ -1,3 +1,6 @@
+html {
+  scroll-behavior: smooth;
+}
 .restaurantPage {
   padding: 0 15%;
 }
@@ -55,55 +58,64 @@
 }
 
 .photos {
-    height: 600px;
-    background-color: grey;
+  height: 600px;
+  background-color: grey;
 }
 
 .restaurantDetails {
-    margin-top: 5%;
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    gap: 40px;
-    align-items: start;
+  margin-top: 5%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  align-items: flex-start;
 }
-
+.restaurantDetails > section:nth-child(odd) {
+  width: 60%;
+}
+.restaurantDetails > section:nth-child(even) {
+  width: 35%;
+}
 .restaurantContacts {
-    text-align: left;
-    border: 1px solid #d6d6d6;
-    width: 85%;
-    box-sizing: border-box;
-    padding: 24px;
-    overflow-wrap: anywhere;
-    justify-self: end;
-    border-radius: 5px;
+  text-align: left;
+  border: 1px solid #d6d6d6;
+  width: 85%;
+  box-sizing: border-box;
+  padding: 24px;
+  overflow-wrap: anywhere;
+  justify-self: end;
+  border-radius: 5px;
 }
 
-.restaurantContacts h2{
-    margin-top: 0;
-    margin-bottom: 24px;
-    text-align: center;
+.restaurantContacts h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  text-align: center;
 }
 .locationLayout {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
 .restaurantMapPreview {
-    display: block;
-    flex: 1 1 240px;
-    min-width: 0;
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 .restaurantMapPreview iframe {
-    display: block;
-    width: 100%;
-    height: 250px;
-    border: 0;
-    pointer-events: none;
+  display: block;
+  width: 100%;
+  height: 250px;
+  border: 0;
+  pointer-events: none;
 }
+
 .locationAddress {
-    align-self: center;
-    margin-left: 2%;
+  align-self: center;
+  margin-left: 2%;
 }
+
 .restaurantHours {
   width: 85%;
   justify-self: end;
@@ -117,6 +129,76 @@
 }
 .restaurantHours p {
   margin: 0;
-  line-height: 3;
+  line-height: 2;
   white-space: pre-line;
+}
+.tabs {
+  margin-top: 10px;
+  display: flex;
+  width: 33%;
+  justify-content: space-between;
+}
+.tabs a {
+  color: black;
+  padding: 10px 0;
+}
+.tabs a:hover {
+    color: orange;
+    text-decoration: none;
+}
+
+.rating-ratingBars {
+    border: 1px solid #d6d6d6;
+    display: flex;
+}
+.ratingBox {
+    width: 12rem;
+    max-width: 100%;
+    padding: 1rem;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #d6d6d6;
+    text-align: center;
+}
+.ratingBox p {
+  margin: 0;
+}
+.ratingNumber {
+    font-size: 40px;
+    font-weight: 600;
+}
+.ratingBarsBox {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+    align-self: center;
+}
+
+.ratingBar {
+    background-color: grey;
+    width: 70%;
+    height: 20px;
+    margin: 5px 0;
+    border-radius: 2px;
+}
+
+.ratingBarToFill {
+  height: 100%;
+  background-color: orange;
+}
+.ratingBarRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+}
+.ratingBarRow > span {
+  width: 50px;
+  flex-shrink: 0;
 }

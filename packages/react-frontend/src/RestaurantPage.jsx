@@ -9,6 +9,7 @@ const mockRestaurants = [
     address: "1001 Higuera St, San Luis Obispo, CA 93401",
     rating: 4.5,
     reviewsNumber: 12,
+    ratingCounts: { 5: 8, 4: 2, 3: 2, 2: 0, 1: 0 },
     phone: "(620) 123-6781",
     email: "firestone@gmail.com",
     description:
@@ -32,6 +33,7 @@ const mockRestaurants = [
     address: "1000 Higuera St, San Luis Obispo, CA 93401",
     rating: 4,
     reviewsNumber: 224,
+    ratingCounts: { 5: 100, 4: 60, 3: 20, 2: 36, 1: 8 },
     phone: "(213) 296-1111",
     email: "woodstock@gmail.com",
     description:
@@ -81,11 +83,71 @@ function Stars(props) {
     </span>
   );
 }
+
+//calculates rating percentages so that they add up to 100%
+function calculateRatingPercentages(props) {
+    const ratings = [5, 4, 3, 2, 1];
+    let total = 0;
+
+    for (const rating of ratings) {
+        total += props.ratingCounts[rating] || 0;
+    }
+
+    const results = ratings.map((number) => {
+        const reviewsNumber = props.ratingCounts[number] || 0;
+        let exactPercentage = 0;
+
+        if (total > 0) {
+            exactPercentage = (reviewsNumber / total) * 100;
+        }
+
+        const roundedPercentage = Math.floor(exactPercentage);
+        const decimal = exactPercentage - roundedPercentage;
+
+        return {
+            number, roundedPercentage, decimal
+        };
+    });
+
+    if (total === 0) {
+        return results;
+    }
+
+    let totalPercentage = 0;
+
+    for (const percentage of results) {
+        totalPercentage += percentage.roundedPercentage;
+    }
+
+    if (totalPercentage === 100) {
+        return results;
+    }
+
+    const sorted_results = [...results].sort((a, b) => {
+        return a.decimal - b.decimal;
+    });
+
+    if (totalPercentage < 100) {
+        for (let i = sorted_results.length - 1; i >= 0; i--) {
+            if (totalPercentage === 100) {
+                break;
+            }
+
+            sorted_results[i].roundedPercentage += 1;
+            totalPercentage += 1;
+        }
+    }
+
+    return results;
+}
+
+
 function RestaurantPage(props) {
   const restaurantToOpen = mockRestaurants.find((item) => item.id === props.selectedRestaurant.id);
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
+  const ratingPercentages = calculateRatingPercentages(restaurantToOpen);
   return (
-    <main className="restaurantPage">
+    <main id="overview" className="restaurantPage">
       <div className="restaurantHeader">
         <p>{restaurantToOpen.address}</p>
 
@@ -109,8 +171,15 @@ function RestaurantPage(props) {
         </div>
       </div>
       <div className="photos"></div>
+      <nav className="tabs">
+        <a href="#overview">Overview</a>
+        <a href="#location">Location</a>
+        <a href="#hours">Hours</a>
+        <a href="#menu">Menu</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
       <div className="restaurantDetails">
-        <section>
+        <section id="about">
           <h2>About</h2>
           <p>{restaurantToOpen.description}</p>
         </section>
@@ -126,7 +195,7 @@ function RestaurantPage(props) {
             </a>
           </p>
         </section>
-        <section className="restaurantLocation">
+        <section id="location" className="restaurantLocation">
           <h2>Location</h2>
           <div className="locationLayout">
             <a
@@ -153,11 +222,33 @@ function RestaurantPage(props) {
             </p>
           </div>
         </section>
-        <section className="restaurantHours">
+        <section id="hours" className="restaurantHours">
           <h2>Hours</h2>
           <p>{restaurantToOpen.hours}</p>
         </section>
       </div>
+      <section id="reviews" className="reviews">
+        <h2>Reviews</h2>
+        <div className="rating-ratingBars">
+          <div className="ratingBox">
+            <p>Overall rating ({restaurantToOpen.reviewsNumber})</p>
+            <span className="ratingNumber">{restaurantToOpen.rating.toFixed(1)} / 5</span>
+            <Stars rating={restaurantToOpen.rating}></Stars>
+          </div>
+          <div className="ratingBarsBox">
+          {ratingPercentages.map((result) => {
+            return (
+                <div key={result.number} className="ratingBarRow">
+                  <span>{result.roundedPercentage}%</span>
+                  <div className="ratingBar">
+                    <div className="ratingBarToFill" style={{ width: `${result.roundedPercentage}%` }}></div>
+                  </div>
+                </div>
+              );
+              })}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
