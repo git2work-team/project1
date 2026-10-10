@@ -124,11 +124,11 @@ function calculateRatingPercentages(props) {
     }
 
     const sorted_results = [...results].sort((a, b) => {
-        return a.decimal - b.decimal;
+        return b.decimal - a.decimal;
     });
 
     if (totalPercentage < 100) {
-        for (let i = sorted_results.length - 1; i >= 0; i--) {
+        for (let i = 0; i <= sorted_results.length - 1; i++) {
             if (totalPercentage === 100) {
                 break;
             }
