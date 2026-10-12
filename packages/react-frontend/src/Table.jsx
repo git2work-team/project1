@@ -2,6 +2,8 @@ function TableHeader() {
   return (
     <thead>
       <tr>
+        <th>Posted by</th>
+        <th>Restaurant</th>
         <th>Rating</th>
         <th>Time visited</th>
         <th>What I got</th>
@@ -13,16 +15,18 @@ function TableHeader() {
 }
 
 function TableBody(props) {
-  const rows = props.characterData.map((row, index) => {
+  const rows = props.reviewData.map((row) => {
     return (
-      <tr key={index}>
+      <tr key={row._id}>
+        <td>{row.userId?.fullName}</td>
+        <td>{row.restaurantId?.name}</td>
         <td>{row.rating}</td>
         <td>{row.timeVisited}</td>
         <td>{row.whatIGot}</td>
         <td>{row.title}</td>
         <td>{row.description}</td>
         <td>
-          <button onClick={() => props.removeCharacter(row._id)}>Delete</button>
+          <button onClick={() => props.removeReview(row._id)}>Delete</button>
         </td>
       </tr>
     );
@@ -34,7 +38,7 @@ function Table(props) {
   return (
     <table>
       <TableHeader />
-      <TableBody characterData={props.characterData} removeCharacter={props.removeCharacter} />
+      <TableBody reviewData={props.reviewData} removeReview={props.removeReview} />
     </table>
   );
 }

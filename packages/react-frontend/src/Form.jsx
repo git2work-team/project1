@@ -1,29 +1,42 @@
 import React, { useState } from "react";
 
+const EMPTY_REVIEW = {
+  restaurantId: "",
+  rating: "",
+  timeVisited: "",
+  whatIGot: "",
+  title: "",
+  description: "",
+};
+
 function Form(props) {
-  const [review, setReview] = useState({
-    rating: "",
-    timeVisited: "",
-    whatIGot: "",
-    title: "",
-    description: "",
-  });
+  const [review, setReview] = useState(EMPTY_REVIEW);
   function handleChange(event) {
     const { name, value } = event.target;
     setReview({ ...review, [name]: value });
   }
   function submitForm() {
     props.handleSubmit(review);
-    setReview({ rating: "", timeVisited: "", whatIGot: "", title: "", description: "" });
+    setReview(EMPTY_REVIEW);
   }
 
   return (
     <form>
+      <label htmlFor="restaurantId">Restaurant</label>
+      <select name="restaurantId" id="restaurantId" value={review.restaurantId} onChange={handleChange}>
+        <option value="">-- Pick a restaurant --</option>
+        {props.restaurants.map((restaurant) => (
+          <option key={restaurant._id} value={restaurant._id}>
+            {restaurant.name}
+          </option>
+        ))}
+      </select>
       <label htmlFor="rating">Rating</label>
       <input
         type="number"
         min="1"
         max="5"
+        step="0.5"
         name="rating"
         id="rating"
         value={review.rating}

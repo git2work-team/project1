@@ -1,97 +1,59 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
-import WantToTry from "./WantToTry";
-import Navbar from "./Navbar";
+import { TEST_USER_ID } from "./config";
+import { getUserById, getRestaurants, getReviews, createReview, deleteReview } from "./api";
 
 function Review() {
-  const [characters, setCharacters] = useState([]);
-  // which page to show until we add real navigation: "reviews" or "wantToTry"
-  const [page, setPage] = useState("reviews");
+  const [user, setUser] = useState(null);
+  const [restaurants, setRestaurants] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
-  }
+  //Load data when the page opens
 
-  //Initially get the Users from backend
-  function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users");
-    return promise;
+  function loadReviews() {
+    getReviews(TEST_USER_ID)
+      .then(setReviews)
+      .catch((error) => console.log(error.message));
   }
 
   useEffect(() => {
-    fetchUsers()
-      .then((res) => res.json())
-      .then((json) => setCharacters(json["users_list"]))
-      .catch((error) => {
-        console.log(error);
-      });
+    getUserById(TEST_USER_ID)
+      .then(setUser)
+      .catch((error) => console.log(error.message));
+
+    getRestaurants()
+      .then(setRestaurants)
+      .catch((error) => console.log(error.message));
+
+    loadReviews();
   }, []);
 
-  //Adds user, gets the input and adds to the list
-  function postUser(review) {
-    const promise = fetch("http://localhost:8000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(review),
-    });
+  //Add a review (belongs to the test user)
 
-    return promise;
+  function addReview(review) {
+    createReview({ ...review, rating: Number(review.rating), userId: TEST_USER_ID })
+      .then(loadReviews) // reload so the new row shows names, not ids
+      .catch((error) => console.log("Insert failed:", error.message));
   }
 
-  function updateList(review) {
-    postUser(review)
-      .then((res) => {
-        if (res.status === 200) {
-          return res.json().then((newUser) => {
-            setCharacters([...characters, newUser]);
-          });
-        } else {
-          console.log("Insert failed, status:", res.status);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  //Delete a review
 
-  //Deletes the user from users list in backend
-  function deleteUser(id) {
-    const promise = fetch(`http://localhost:8000/users/${id}`, {
-      method: "DELETE",
-    });
-
-    return promise;
-  }
-
-  function updateDelete(id) {
-    deleteUser(id)
-      .then((response) => {
-        if (response.status === 200) {
-          setCharacters((prevCharacters) =>
-            prevCharacters.filter((character) => {
-              return character["_id"] !== id;
-            })
-          );
-        } else {
-          console.log("Deletion failed: status:", response.status);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  function removeReview(id) {
+    deleteReview(id)
+      .then(() => setReviews(reviews.filter((review) => review._id !== id)))
+      .catch((error) => console.log("Deletion failed:", error.message));
   }
 
   return (
     <div className="container">
-	 <Table characterData={characters} removeCharacter={updateDelete} />
-          <Form handleSubmit={updateList} />
+      <p>
+        Reviewing as: {user ? user.fullName : "(user not found - check TEST_USER_ID in config.js)"}
+      </p>
+      <Table reviewData={reviews} removeReview={removeReview} />
+      <Form handleSubmit={addReview} restaurants={restaurants} />
     </div>
   );
 }
+
 export default Review;
