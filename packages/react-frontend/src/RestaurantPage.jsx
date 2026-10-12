@@ -1,5 +1,6 @@
 import React from "react";
 import "./RestaurantPage.css";
+import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
 
 //Mock Restaurant data
 const mockRestaurants = [
@@ -50,6 +51,78 @@ const mockRestaurants = [
     ].join("\n"),
     avgPrice: "$$",
     website: "https://woodstocksslo.com/",
+  },
+  {
+    id: 3,
+    name: "Taqueria Santa Cruz",
+    address: "1308 Monterey St, San Luis Obispo, CA 93401",
+    rating: 4.6,
+    reviewsNumber: 27,
+    ratingCounts: { 5: 19, 4: 6, 3: 1, 2: 1, 1: 0 },
+    phone: "(805) 555-0143",
+    email: "taqueriasantacruz@gmail.com",
+    description:
+      "A small family-run taqueria close to campus with tacos, burritos, and a salsa bar. Popular with students because it is fast and cheap.",
+    dietaryOptions: "Vegetarian Gluten-free",
+    hours: [
+      "Monday: 9:00 AM – 9:00 PM",
+      "Tuesday: 9:00 AM – 9:00 PM",
+      "Wednesday: 9:00 AM – 9:00 PM",
+      "Thursday: 9:00 AM – 9:00 PM",
+      "Friday: 9:00 AM – 10:00 PM",
+      "Saturday: 9:00 AM – 10:00 PM",
+      "Sunday: 9:00 AM – 8:00 PM",
+    ].join("\n"),
+    avgPrice: "$",
+    website: "https://www.google.com/search?q=Taqueria+Santa+Cruz+San+Luis+Obispo",
+  },
+  {
+    id: 4,
+    name: "Scout Coffee",
+    address: "1130 Garden St, San Luis Obispo, CA 93401",
+    rating: 4.6,
+    reviewsNumber: 44,
+    ratingCounts: { 5: 30, 4: 11, 3: 2, 2: 1, 1: 0 },
+    phone: "(805) 555-0178",
+    email: "scoutcoffee@gmail.com",
+    description:
+      "A cozy downtown coffee shop with house-roasted coffee, homemade syrups, and pastries baked every morning. A lot of students come here to study.",
+    dietaryOptions: "Vegan Vegetarian",
+    hours: [
+      "Monday: 6:30 AM – 6:00 PM",
+      "Tuesday: 6:30 AM – 6:00 PM",
+      "Wednesday: 6:30 AM – 6:00 PM",
+      "Thursday: 6:30 AM – 6:00 PM",
+      "Friday: 6:30 AM – 6:00 PM",
+      "Saturday: 7:00 AM – 6:00 PM",
+      "Sunday: 7:00 AM – 6:00 PM",
+    ].join("\n"),
+    avgPrice: "$",
+    website: "https://www.scoutcoffeeco.com/",
+  },
+  {
+    id: 5,
+    name: "Big Sky Café",
+    address: "1121 Broad St, San Luis Obispo, CA 93401",
+    rating: 4.4,
+    reviewsNumber: 19,
+    ratingCounts: { 5: 11, 4: 6, 3: 1, 2: 1, 1: 0 },
+    phone: "(805) 555-0112",
+    email: "bigskycafe@gmail.com",
+    description:
+      "A downtown cafe known for brunch and fresh local ingredients, with a lot of vegetarian and vegan options. It gets busy on weekend mornings.",
+    dietaryOptions: "Vegan Vegetarian Gluten-free",
+    hours: [
+      "Monday: 8:00 AM – 8:00 PM",
+      "Tuesday: 8:00 AM – 8:00 PM",
+      "Wednesday: 8:00 AM – 8:00 PM",
+      "Thursday: 8:00 AM – 8:00 PM",
+      "Friday: 8:00 AM – 9:00 PM",
+      "Saturday: 8:00 AM – 9:00 PM",
+      "Sunday: 8:00 AM – 8:00 PM",
+    ].join("\n"),
+    avgPrice: "$$",
+    website: "https://bigskycafe.com/",
   },
 ];
 
@@ -170,7 +243,8 @@ function RestaurantPage(props) {
           ))}
         </div>
       </div>
-      <div className="photos"></div>
+      <RestaurantPhotos />
+      <RestaurantActions />
       <nav className="tabs">
         <a href="#overview">Overview</a>
         <a href="#location">Location</a>
@@ -227,6 +301,7 @@ function RestaurantPage(props) {
           <p>{restaurantToOpen.hours}</p>
         </section>
       </div>
+      <RestaurantMenu restaurantId={restaurantToOpen.id} />
       <section id="reviews" className="reviews">
         <h2>Reviews</h2>
         <div className="rating-ratingBars">

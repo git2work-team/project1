@@ -102,6 +102,28 @@
   font-size: 1.15rem;
 }
 
+/* restaurant name is a button (opens the restaurant page) but should look like a title */
+.wtt-info h3 button,
+.wtt-info h3 button:hover,
+.wtt-info h3 button:focus {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wtt-info h3 button:hover {
+  text-decoration: underline;
+}
+
+.wtt-card-tried h3 button {
+  text-decoration: line-through;
+}
+
 .wtt-tag {
   display: inline-block;
   padding: 3px 8px;
