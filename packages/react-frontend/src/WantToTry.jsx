@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./WantToTry.css";
-
+import RestaurantPage from "./RestaurantPage.jsx";
 // Placeholder data for now. Later this should come from the saved-restaurants route.
 const starterSpots = [
   { id: 1, name: "Woodstock's Pizza", tag: "Deal", tried: false },
@@ -33,7 +33,9 @@ function SpotCard(props) {
     <div className={spot.tried ? "wtt-card wtt-card-tried" : "wtt-card"}>
       <div className="wtt-image">IMAGE</div>
       <div className="wtt-info">
-        <h3>{spot.name}</h3>
+        <h3>
+          <button onClick={() => props.openRestaurant(spot)}>{spot.name}</button>
+        </h3>
         <span className={tagClass}>{spot.tag}</span>
       </div>
       <div className="wtt-actions">
@@ -48,7 +50,7 @@ function SpotCard(props) {
   );
 }
 
-function WantToTry() {
+function WantToTry(props) {
   const [spots, setSpots] = useState(starterSpots);
   const [filter, setFilter] = useState("All");
 
@@ -93,7 +95,13 @@ function WantToTry() {
         <div className="wtt-list">
           {shown.length === 0 && <p className="wtt-empty">No places here yet.</p>}
           {shown.map((spot) => (
-            <SpotCard key={spot.id} spot={spot} toggleTried={toggleTried} removeSpot={removeSpot} />
+            <SpotCard
+              key={spot.id}
+              spot={spot}
+              toggleTried={toggleTried}
+              removeSpot={removeSpot}
+              openRestaurant={props.openRestaurant}
+            />
           ))}
         </div>
 
