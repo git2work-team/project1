@@ -159,64 +159,73 @@ function Stars(props) {
 
 //calculates rating percentages so that they add up to 100%
 function calculateRatingPercentages(props) {
-    const ratings = [5, 4, 3, 2, 1];
-    let total = 0;
+  const ratings = [5, 4, 3, 2, 1];
+  let total = 0;
 
-    for (const rating of ratings) {
-        total += props.ratingCounts[rating] || 0;
+  for (const rating of ratings) {
+    total += props.ratingCounts[rating] || 0;
+  }
+
+  const results = ratings.map((number) => {
+    const reviewsNumber = props.ratingCounts[number] || 0;
+    let exactPercentage = 0;
+
+    if (total > 0) {
+      exactPercentage = (reviewsNumber / total) * 100;
     }
 
-    const results = ratings.map((number) => {
-        const reviewsNumber = props.ratingCounts[number] || 0;
-        let exactPercentage = 0;
+    const roundedPercentage = Math.floor(exactPercentage);
+    const decimal = exactPercentage - roundedPercentage;
 
-        if (total > 0) {
-            exactPercentage = (reviewsNumber / total) * 100;
-        }
+    return {
+      number,
+      roundedPercentage,
+      decimal,
+    };
+  });
 
-        const roundedPercentage = Math.floor(exactPercentage);
-        const decimal = exactPercentage - roundedPercentage;
-
-        return {
-            number, roundedPercentage, decimal
-        };
-    });
-
-    if (total === 0) {
-        return results;
-    }
-
-    let totalPercentage = 0;
-
-    for (const percentage of results) {
-        totalPercentage += percentage.roundedPercentage;
-    }
-
-    if (totalPercentage === 100) {
-        return results;
-    }
-
-    const sorted_results = [...results].sort((a, b) => {
-        return b.decimal - a.decimal;
-    });
-
-    if (totalPercentage < 100) {
-        for (let i = 0; i <= sorted_results.length - 1; i++) {
-            if (totalPercentage === 100) {
-                break;
-            }
-
-            sorted_results[i].roundedPercentage += 1;
-            totalPercentage += 1;
-        }
-    }
-
+  if (total === 0) {
     return results;
+  }
+
+  let totalPercentage = 0;
+
+  for (const percentage of results) {
+    totalPercentage += percentage.roundedPercentage;
+  }
+
+  if (totalPercentage === 100) {
+    return results;
+  }
+
+  const sorted_results = [...results].sort((a, b) => {
+    return b.decimal - a.decimal;
+  });
+
+  if (totalPercentage < 100) {
+    for (let i = 0; i <= sorted_results.length - 1; i++) {
+      if (totalPercentage === 100) {
+        break;
+      }
+
+      sorted_results[i].roundedPercentage += 1;
+      totalPercentage += 1;
+    }
+  }
+
+  return results;
 }
 
-
 function RestaurantPage(props) {
-  const restaurantToOpen = mockRestaurants.find((item) => item.id === props.selectedRestaurant.id);
+  const restaurantToOpen = mockRestaurants.find(
+    (item) => item.id === props.selectedRestaurant.id
+  ) || {
+    rating: 0,
+    reviewsNumber: 0,
+    ratingCounts: {},
+    dietaryOptions: "",
+    ...props.selectedRestaurant,
+  };
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
   const ratingPercentages = calculateRatingPercentages(restaurantToOpen);
   return (
@@ -311,16 +320,19 @@ function RestaurantPage(props) {
             <Stars rating={restaurantToOpen.rating}></Stars>
           </div>
           <div className="ratingBarsBox">
-          {ratingPercentages.map((result) => {
-            return (
+            {ratingPercentages.map((result) => {
+              return (
                 <div key={result.number} className="ratingBarRow">
                   <span>{result.roundedPercentage}%</span>
                   <div className="ratingBar">
-                    <div className="ratingBarToFill" style={{ width: `${result.roundedPercentage}%` }}></div>
+                    <div
+                      className="ratingBarToFill"
+                      style={{ width: `${result.roundedPercentage}%` }}
+                    ></div>
                   </div>
                 </div>
               );
-              })}
+            })}
           </div>
         </div>
       </section>
