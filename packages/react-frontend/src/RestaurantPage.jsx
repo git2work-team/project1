@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
+import { getReviewsByRestaurant } from "./api.js";
 
 //Mock Restaurant data
 const mockRestaurants = [
@@ -216,15 +217,42 @@ function calculateRatingPercentages(props) {
   return results;
 }
 
+function summarizeReviews(reviews) {
+  const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  let total = 0;
+
+  for (const review of reviews) {
+    ratingCounts[Math.floor(review.rating)] += 1;
+    total += review.rating;
+  }
+
+  return {
+    rating: reviews.length > 0 ? total / reviews.length : 0,
+    reviewsNumber: reviews.length,
+    ratingCounts: ratingCounts,
+  };
+}
+
 function RestaurantPage(props) {
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    if (!props.selectedRestaurant._id) {
+      return;
+    }
+    getReviewsByRestaurant(props.selectedRestaurant._id)
+      .then(setReviews)
+      .catch((error) => console.log(error.message));
+  }, [props.selectedRestaurant._id]);
+
+  const reviewSummary = summarizeReviews(reviews);
+
   const restaurantToOpen = mockRestaurants.find(
     (item) => item.id === props.selectedRestaurant.id
   ) || {
-    rating: 0,
-    reviewsNumber: 0,
-    ratingCounts: {},
     dietaryOptions: "",
     ...props.selectedRestaurant,
+    ...reviewSummary,
   };
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
   const ratingPercentages = calculateRatingPercentages(restaurantToOpen);
@@ -335,6 +363,17 @@ function RestaurantPage(props) {
             })}
           </div>
         </div>
+        {reviews.length === 0 && <p>No reviews yet.</p>}
+        {reviews.map((review) => (
+          <div key={review._id}>
+            <h3>{review.title}</h3>
+            <Stars rating={review.rating} />
+            <p>
+              {review.userId?.fullName} Ordered: {review.whatIGot}
+            </p>
+            <p>{review.description}</p>
+          </div>
+        ))}
       </section>
     </main>
   );
