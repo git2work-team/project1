@@ -137,7 +137,7 @@ async function saveRestaurant(place) {
   }
 
   //filters place.types to only have the ones not in GENERIC_TYPES
-  const usefulTypes = (place.types || []).filter((type) => GENERIC_TYPES.has(type));
+  const usefulTypes = (place.types || []).filter((type) => !GENERIC_TYPES.has(type));
   if (usefulTypes.length > 0) {
     update.types = usefulTypes;
   }
@@ -182,7 +182,9 @@ async function importRestaurants() {
   console.log(`Done. Added ${counts.added}, updated ${counts.updated}, skipped ${counts.skipped}.`);
 }
 
-importRestaurants().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+importRestaurants()
+  .catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  })
+  .finally(() => mongoose.disconnect());
