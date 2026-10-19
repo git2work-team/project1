@@ -23,6 +23,14 @@ export function getUserById(id) {
   return request(`/users/${id}`);
 }
 
+export function createUser(user) {
+  return request("/users", { method: "POST", body: JSON.stringify(user) });
+}
+
+export function loginUser(email, password) {
+  return request("/users/login", { method: "POST", body: JSON.stringify({ email, password }) });
+}
+
 // ---------- Restaurants (restaurant-routes.js) ----------
 
 export function getRestaurants() {
