@@ -6,24 +6,21 @@ import Review from "./Review";
 
 import "./Navbar.css";
 function Navbar() {
-
   return (
     <nav className="navbar">
-	  <a href="/" className="site-title">SLOFoods</a>
+      <a href="/" className="site-title">
+        SLOFoods
+      </a>
 
-	  <ul>
-	    <li>
-	      <a href = "/Review">Review</a>
-	      
-	    </li>
-	    <li>
-	      <a href = "/WantToTry">Saved</a>
-	    </li>
-	      
-	  </ul>
-
+      <ul>
+        <li>
+          <a href="/Browse">Browse</a>
+        </li>
+        <li>
+          <a href="/WantToTry">Saved</a>
+        </li>
+      </ul>
     </nav>
   );
 }
 export default Navbar;
-

@@ -34,6 +34,34 @@ const RestaurantSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // The Google API
+    googlePlaceId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+    photoName: {
+      type: String,
+      trim: true,
+    },
+    photoFetchedAt: {
+      type: Date,
+    },
+    //help with sorting
+    cuisine: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    cuisineLabel: {
+      type: String,
+      trim: true,
+    },
+    types: {
+      type: [String],
+      default: undefined,
+    },
   },
   { timestamps: true }
 );

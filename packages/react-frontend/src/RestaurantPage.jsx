@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
+import { getReviewsByRestaurant } from "./api.js";
 
 //Mock Restaurant data
 const mockRestaurants = [
@@ -159,64 +160,100 @@ function Stars(props) {
 
 //calculates rating percentages so that they add up to 100%
 function calculateRatingPercentages(props) {
-    const ratings = [5, 4, 3, 2, 1];
-    let total = 0;
+  const ratings = [5, 4, 3, 2, 1];
+  let total = 0;
 
-    for (const rating of ratings) {
-        total += props.ratingCounts[rating] || 0;
+  for (const rating of ratings) {
+    total += props.ratingCounts[rating] || 0;
+  }
+
+  const results = ratings.map((number) => {
+    const reviewsNumber = props.ratingCounts[number] || 0;
+    let exactPercentage = 0;
+
+    if (total > 0) {
+      exactPercentage = (reviewsNumber / total) * 100;
     }
 
-    const results = ratings.map((number) => {
-        const reviewsNumber = props.ratingCounts[number] || 0;
-        let exactPercentage = 0;
+    const roundedPercentage = Math.floor(exactPercentage);
+    const decimal = exactPercentage - roundedPercentage;
 
-        if (total > 0) {
-            exactPercentage = (reviewsNumber / total) * 100;
-        }
+    return {
+      number,
+      roundedPercentage,
+      decimal,
+    };
+  });
 
-        const roundedPercentage = Math.floor(exactPercentage);
-        const decimal = exactPercentage - roundedPercentage;
-
-        return {
-            number, roundedPercentage, decimal
-        };
-    });
-
-    if (total === 0) {
-        return results;
-    }
-
-    let totalPercentage = 0;
-
-    for (const percentage of results) {
-        totalPercentage += percentage.roundedPercentage;
-    }
-
-    if (totalPercentage === 100) {
-        return results;
-    }
-
-    const sorted_results = [...results].sort((a, b) => {
-        return b.decimal - a.decimal;
-    });
-
-    if (totalPercentage < 100) {
-        for (let i = 0; i <= sorted_results.length - 1; i++) {
-            if (totalPercentage === 100) {
-                break;
-            }
-
-            sorted_results[i].roundedPercentage += 1;
-            totalPercentage += 1;
-        }
-    }
-
+  if (total === 0) {
     return results;
+  }
+
+  let totalPercentage = 0;
+
+  for (const percentage of results) {
+    totalPercentage += percentage.roundedPercentage;
+  }
+
+  if (totalPercentage === 100) {
+    return results;
+  }
+
+  const sorted_results = [...results].sort((a, b) => {
+    return b.decimal - a.decimal;
+  });
+
+  if (totalPercentage < 100) {
+    for (let i = 0; i <= sorted_results.length - 1; i++) {
+      if (totalPercentage === 100) {
+        break;
+      }
+
+      sorted_results[i].roundedPercentage += 1;
+      totalPercentage += 1;
+    }
+  }
+
+  return results;
 }
 
+function summarizeReviews(reviews) {
+  const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  let total = 0;
+
+  for (const review of reviews) {
+    ratingCounts[Math.floor(review.rating)] += 1;
+    total += review.rating;
+  }
+
+  return {
+    rating: reviews.length > 0 ? total / reviews.length : 0,
+    reviewsNumber: reviews.length,
+    ratingCounts: ratingCounts,
+  };
+}
 
 function RestaurantPage(props) {
-  const restaurantToOpen = mockRestaurants.find((item) => item.id === props.selectedRestaurant.id);
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    if (!props.selectedRestaurant._id) {
+      return;
+    }
+    getReviewsByRestaurant(props.selectedRestaurant._id)
+      .then(setReviews)
+      .catch((error) => console.log(error.message));
+  }, [props.selectedRestaurant._id]);
+
+  const reviewSummary = summarizeReviews(reviews);
+
+  const restaurantToOpen = mockRestaurants.find(
+    (item) => item.id === props.selectedRestaurant.id
+  ) || {
+    dietaryOptions: "",
+    ...props.selectedRestaurant,
+    ...reviewSummary,
+  };
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
   const ratingPercentages = calculateRatingPercentages(restaurantToOpen);
   return (
@@ -311,18 +348,32 @@ function RestaurantPage(props) {
             <Stars rating={restaurantToOpen.rating}></Stars>
           </div>
           <div className="ratingBarsBox">
-          {ratingPercentages.map((result) => {
-            return (
+            {ratingPercentages.map((result) => {
+              return (
                 <div key={result.number} className="ratingBarRow">
                   <span>{result.roundedPercentage}%</span>
                   <div className="ratingBar">
-                    <div className="ratingBarToFill" style={{ width: `${result.roundedPercentage}%` }}></div>
+                    <div
+                      className="ratingBarToFill"
+                      style={{ width: `${result.roundedPercentage}%` }}
+                    ></div>
                   </div>
                 </div>
               );
-              })}
+            })}
           </div>
         </div>
+        {reviews.length === 0 && <p>No reviews yet.</p>}
+        {reviews.map((review) => (
+          <div key={review._id}>
+            <h3>{review.title}</h3>
+            <Stars rating={review.rating} />
+            <p>
+              {review.userId?.fullName} Ordered: {review.whatIGot}
+            </p>
+            <p>{review.description}</p>
+          </div>
+        ))}
       </section>
     </main>
   );

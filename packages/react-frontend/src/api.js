@@ -59,3 +59,7 @@ export function saveRestaurant(userId, restaurantId) {
 export function unsaveRestaurant(userId, restaurantId) {
   return request(`/users/${userId}/saved-restaurants/${restaurantId}`, { method: "DELETE" });
 }
+
+export function getReviewsByRestaurant(restaurantId) {
+  return request(`/reviews?restaurantId=${restaurantId}`);
+}
