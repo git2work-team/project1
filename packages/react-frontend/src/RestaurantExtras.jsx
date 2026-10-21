@@ -82,7 +82,7 @@ export function RestaurantActions({restaurantId}) {
     .catch((error) => {
       console.log("Could not load saved restaurant: ", error.message);
     });
-  });
+  }, [restaurantId]);
 // Saves/unsaves the restaurant when a user is clicking a button
   async function toggleSaved() {
     try {
