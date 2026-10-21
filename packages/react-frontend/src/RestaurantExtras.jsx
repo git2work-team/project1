@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./RestaurantExtras.css";
-
+import { getSavedRestaurants, saveRestaurant, unsaveRestaurant } from "./api";
+import { TEST_USER_ID } from "./config";
 // Placeholder menus for now, matched to the mock restaurants by id.
 // Later this should come from the menu-items route.
 const mockMenus = {
@@ -56,10 +57,46 @@ export function RestaurantPhotos() {
   );
 }
 
-// Write a review / Add photos / Save buttons
-export function RestaurantActions() {
-  const [saved, setSaved] = useState(false);
+// Write a review / Add photos
 
+//Checks whether the restaurant that the user is viewing is already saved
+export function RestaurantActions({restaurantId}) {
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    getSavedRestaurants(TEST_USER_ID)
+    .then((data) => {
+      let isSaved = false;
+      for (const entry of data) {
+        let resturant = entry.restaurantId;
+        //if restaurant exists
+        if (resturant) {
+          //if restaurant's id matches the restaurant that the user is viewing
+          if (resturant._id === restaurantId) {
+            isSaved = true;
+            break
+          }
+        }
+      }
+      setSaved(isSaved);
+    })
+    .catch((error) => {
+      console.log("Could not load saved restaurant: ", error.message);
+    });
+  }, [restaurantId]);
+// Saves/unsaves the restaurant when a user is clicking a button
+  async function toggleSaved() {
+    try {
+      if (saved) {
+        await unsaveRestaurant(TEST_USER_ID, restaurantId)
+      } else {
+        await saveRestaurant(TEST_USER_ID, restaurantId)
+      }
+      setSaved(!saved)
+    }
+    catch (error) {
+      console.log("Could not update saved restaurant: ", error.message)
+    }
+  }
   return (
     <div className="rx-actions">
       <a className="rx-btn" href="/Review">
@@ -67,7 +104,7 @@ export function RestaurantActions() {
       </a>
       {/* TODO: no photo upload yet, this button doesn't do anything */}
       <button className="rx-btn">Add photos</button>
-      <button className={saved ? "rx-btn rx-btn-saved" : "rx-btn"} onClick={() => setSaved(!saved)}>
+      <button className={saved ? "rx-btn rx-btn-saved" : "rx-btn"} onClick={toggleSaved}>
         {saved ? "Saved ✓" : "Save"}
       </button>
     </div>

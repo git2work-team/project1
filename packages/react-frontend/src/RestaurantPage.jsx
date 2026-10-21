@@ -281,7 +281,8 @@ function RestaurantPage(props) {
         </div>
       </div>
       <RestaurantPhotos />
-      <RestaurantActions />
+      <RestaurantActions
+      restaurantId={props.selectedRestaurant._id}/>
       <nav className="tabs">
         <a href="#overview">Overview</a>
         <a href="#location">Location</a>
