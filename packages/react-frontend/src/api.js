@@ -40,7 +40,8 @@ export function getRestaurants() {
 // ---------- Reviews (review-routes.js) ----------
 
 export function getReviews(userId) {
-  return request(`/reviews?userId=${userId}`);
+  const query = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+  return request(`/reviews${query}`);
 }
 
 export function createReview(review) {
