@@ -91,9 +91,6 @@ describe("createReview", () => {
     userId: "u1",
     restaurantId: "r1",
     rating: 4.5,
-    timeVisited: "Lunch",
-    whatIGot: "Tacos",
-    title: "Great",
     description: "Loved it",
   };
 

@@ -1,0 +1,68 @@
+.reviewPage {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.reviewRestaurantName {
+  font-weight: 700;
+  margin: 0;
+}
+
+.reviewRestaurantAddress {
+  font-weight: 400;
+  margin: 4px 0 24px;
+}
+
+.reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reviewStars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* main.css styles every button blue (including :hover/:focus/:active). The
+   "button" in the selector makes it more specific than those rules in every state */
+.reviewStars button.reviewStar {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 40px;
+  line-height: 1;
+  color: lightgray;
+}
+
+.reviewStars button.reviewStar.reviewStarOn {
+  color: orange;
+}
+
+.reviewStarLabel {
+  margin-left: 12px;
+  font-size: 18px;
+}
+
+.reviewForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.postReviewBtn {
+  align-self: flex-start;
+  padding: 10px 24px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.postReviewBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

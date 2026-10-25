@@ -13,32 +13,33 @@ function MyApp() {
     setSelectedRestaurant(restaurant);
   }
 
+  // Set while the user is writing a review; shows the Review page for that restaurant
+  const [reviewingRestaurant, setReviewingRestaurant] = useState(null);
+
+  const restaurantPage = selectedRestaurant && (
+    <RestaurantPage selectedRestaurant={selectedRestaurant} onReview={setReviewingRestaurant} />
+  );
+
   let content;
   switch (window.location.pathname) {
     case "/Browse":
-      content = selectedRestaurant ? (
-        <RestaurantPage selectedRestaurant={selectedRestaurant} />
-      ) : (
-        <Browse openRestaurant={openRestaurant} />
-      );
+      content = restaurantPage || <Browse openRestaurant={openRestaurant} />;
       break;
     case "/Review":
-      content = selectedRestaurant ? (
-        <RestaurantPage selectedRestaurant={selectedRestaurant} />
-      ) : (
-        <Review openRestaurant={openRestaurant} />
-      );
+      content = restaurantPage || <Review restaurant={null} />;
       break;
     case "/WantToTry":
-      content = selectedRestaurant ? (
-        <RestaurantPage selectedRestaurant={selectedRestaurant} />
-      ) : (
-        <WantToTry openRestaurant={openRestaurant} />
-      );
+      content = restaurantPage || <WantToTry openRestaurant={openRestaurant} />;
       break;
     case "/":
       content = <Homepage />;
       break;
+  }
+
+  if (reviewingRestaurant) {
+    content = (
+      <Review restaurant={reviewingRestaurant} onDone={() => setReviewingRestaurant(null)} />
+    );
   }
 
   return (

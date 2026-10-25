@@ -34,7 +34,7 @@ async function getReviewById(req, res) {
 }
 
 async function createReview(req, res) {
-  const { userId, restaurantId, rating, timeVisited, whatIGot, title, description } = req.body;
+  const { userId, restaurantId, rating, description } = req.body;
 
   const userExists = await User.exists({ _id: userId });
   if (!userExists) {
@@ -50,9 +50,6 @@ async function createReview(req, res) {
     userId,
     restaurantId,
     rating,
-    timeVisited,
-    whatIGot,
-    title,
     description,
   });
   res.status(201).json(review);

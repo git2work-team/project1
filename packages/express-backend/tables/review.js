@@ -22,21 +22,6 @@ const ReviewSchema = new mongoose.Schema(
         message: "Rating must be in steps of 0.5",
       },
     },
-    timeVisited: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    whatIGot: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     description: {
       type: String,
       required: true,
