@@ -58,7 +58,7 @@ export function RestaurantPhotos() {
 }
 
 // Write a review / Add photos / Save buttons
-export function RestaurantActions(props) {
+export function RestaurantActions(restaurantId) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
     getSavedRestaurants(TEST_USER_ID)
