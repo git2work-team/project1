@@ -1,14 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { TEST_USER_ID } from "./config.js";
+import { getSavedRestaurants, saveRestaurant } from "./api.js";
 import "./WantToTry.css";
 import RestaurantPage from "./RestaurantPage.jsx";
-// Placeholder data for now. Later this should come from the saved-restaurants route.
-const starterSpots = [
-  { id: 1, name: "Woodstock's Pizza", tag: "Deal", tried: false },
-  { id: 2, name: "Firestone Grill", tag: "Wait time", tried: false },
-  { id: 3, name: "Taqueria Santa Cruz", tag: "Deal", tried: false },
-  { id: 4, name: "Scout Coffee", tag: "Short wait", tried: false },
-  { id: 5, name: "Big Sky Café", tag: "Wait time", tried: false },
-];
 
 const deals = [
   "Woodstock's Pizza - deal of the week",
@@ -39,10 +33,10 @@ function SpotCard(props) {
         <span className={tagClass}>{spot.tag}</span>
       </div>
       <div className="wtt-actions">
-        <button className="wtt-btn wtt-btn-orange" onClick={() => props.toggleTried(spot.id)}>
+        <button className="wtt-btn wtt-btn-orange" onClick={() => props.toggleTried(spot._id)}>
           {spot.tried ? "Tried ✓" : "Mark as tried"}
         </button>
-        <button className="wtt-btn wtt-btn-outline" onClick={() => props.removeSpot(spot.id)}>
+        <button className="wtt-btn wtt-btn-outline" onClick={() => props.removeSpot(spot._id)}>
           Remove
         </button>
       </div>
@@ -51,12 +45,25 @@ function SpotCard(props) {
 }
 
 function WantToTry(props) {
-  const [spots, setSpots] = useState(starterSpots);
+  const [spots, setSpots] = useState([]);
   const [filter, setFilter] = useState("All");
-
+  const [error, setError] = useState("");
+  useEffect(() => {
+    getSavedRestaurants(TEST_USER_ID)
+      .then((data) => {
+        console.log("Saved restaurants: ", data);
+        const restaurants = data
+        .map((saved) => saved.restaurantId)
+        .filter(Boolean);
+        setSpots(restaurants)
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }, []);
   function toggleTried(id) {
     const updated = spots.map((spot) => {
-      if (spot.id === id) {
+      if (spot._id === id) {
         return { ...spot, tried: !spot.tried };
       }
       return spot;
@@ -65,7 +72,7 @@ function WantToTry(props) {
   }
 
   function removeSpot(id) {
-    setSpots(spots.filter((spot) => spot.id !== id));
+    setSpots(spots.filter((spot) => spot._id !== id));
   }
 
   const shown = spots.filter((spot) => {
@@ -96,7 +103,7 @@ function WantToTry(props) {
           {shown.length === 0 && <p className="wtt-empty">No places here yet.</p>}
           {shown.map((spot) => (
             <SpotCard
-              key={spot.id}
+              key={spot._id}
               spot={spot}
               toggleTried={toggleTried}
               removeSpot={removeSpot}

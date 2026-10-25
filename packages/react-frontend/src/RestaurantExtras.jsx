@@ -70,7 +70,7 @@ export function RestaurantActions({restaurantId}) {
         let resturant = entry.restaurantId;
         //if restaurant exists
         if (resturant) {
-          //if restaurant's id matches the restaurant that the user is viewing
+          //if saved restaurant's id matches the restaurant that the user is viewing
           if (resturant._id === restaurantId) {
             isSaved = true;
             break
