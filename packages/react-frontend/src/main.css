@@ -503,7 +503,7 @@ h6 {
   }
 }
 a {
-  color: light-dark(#0366ee, #ffeea8);
+  color: light-dark(darkgreen, #ffeea8);
   text-decoration: none;
 }
 a:hover,
@@ -840,9 +840,9 @@ button,
 [type="image"] {
   -webkit-appearance: none;
   display: inline-block;
-  border: 1px solid #0366ee;
+  border: 1px solid darkgreen;
   border-radius: 4px;
-  background: #0366ee;
+  background: darkgreen;
   color: #ffffff;
   font-weight: 600;
   font-family:
@@ -870,8 +870,8 @@ button:hover,
 [type="reset"]:hover,
 [type="button"]:hover,
 [type="image"]:hover {
-  border: 1px solid rgb(2.3651452282, 80.4149377593, 187.6348547718);
-  background: rgb(2.3651452282, 80.4149377593, 187.6348547718);
+  border: 1px solid #004d00;
+  background: #004d00;
   color: #ffffff;
   text-decoration: none;
 }
@@ -890,8 +890,8 @@ button:active,
 [type="button"]:active,
 [type="image"]:focus,
 [type="image"]:active {
-  border: 1px solid rgb(2.3651452282, 80.4149377593, 187.6348547718);
-  background: rgb(2.3651452282, 80.4149377593, 187.6348547718);
+  border: 1px solid #004d00;
+  background: #004d00;
   color: #ffffff;
   text-decoration: none;
 }
@@ -1054,7 +1054,7 @@ select:focus,
 select:active,
 textarea:focus,
 textarea:active {
-  border: 1px solid light-dark(#0366ee, #ffeea8);
+  border: 1px solid light-dark(darkgreen, #ffeea8);
   box-shadow:
     inset 0 1px 1px rgba(0, 0, 0, 0.1),
     0 0 6px

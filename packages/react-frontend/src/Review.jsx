@@ -1,57 +1,32 @@
-import React, { useState, useEffect } from "react";
-import Table from "./Table";
+import React from "react";
+import "./Review.css";
 import Form from "./Form";
 import { TEST_USER_ID } from "./config";
-import { getUserById, getRestaurants, getReviews, createReview, deleteReview } from "./api";
+import { createReview } from "./api";
 
-function Review() {
-  const [user, setUser] = useState(null);
-  const [restaurants, setRestaurants] = useState([]);
-  const [reviews, setReviews] = useState([]);
+function Review(props) {
+  const restaurant = props.restaurant;
 
-  //Load data when the page opens
-
-  function loadReviews() {
-    getReviews(TEST_USER_ID)
-      .then(setReviews)
-      .catch((error) => console.log(error.message));
+  if (!restaurant) {
+    return (
+      <div className="container reviewPage">
+        <p>Pick a restaurant from Browse and press its review card to write a review.</p>
+      </div>
+    );
   }
 
-  useEffect(() => {
-    getUserById(TEST_USER_ID)
-      .then(setUser)
-      .catch((error) => console.log(error.message));
-
-    getRestaurants()
-      .then(setRestaurants)
-      .catch((error) => console.log(error.message));
-
-    loadReviews();
-  }, []);
-
-  //Add a review (belongs to the test user)
-
+  //Add a review (belongs to the test user), then go back to the restaurant page
   function addReview(review) {
-    createReview({ ...review, rating: Number(review.rating), userId: TEST_USER_ID })
-      .then(loadReviews) // reload so the new row shows names, not ids
+    createReview({ ...review, userId: TEST_USER_ID, restaurantId: restaurant._id })
+      .then(props.onDone)
       .catch((error) => console.log("Insert failed:", error.message));
   }
 
-  //Delete a review
-
-  function removeReview(id) {
-    deleteReview(id)
-      .then(() => setReviews(reviews.filter((review) => review._id !== id)))
-      .catch((error) => console.log("Deletion failed:", error.message));
-  }
-
   return (
-    <div className="container">
-      <p>
-        Reviewing as: {user ? user.fullName : "(user not found - check TEST_USER_ID in config.js)"}
-      </p>
-      <Table reviewData={reviews} removeReview={removeReview} />
-      <Form handleSubmit={addReview} restaurants={restaurants} />
+    <div className="container reviewPage">
+      <h1 className="reviewRestaurantName">{restaurant.name}</h1>
+      <p className="reviewRestaurantAddress">{restaurant.address}</p>
+      <Form handleSubmit={addReview} />
     </div>
   );
 }

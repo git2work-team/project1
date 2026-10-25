@@ -143,7 +143,7 @@ function Stars(props) {
           <span
             key={idx}
             style={{
-              fontSize: "20px",
+              fontSize: props.size || "20px",
               background: `linear-gradient(to right, orange ${starFillPercentage}%, lightgray ${starFillPercentage}%)`,
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
@@ -342,6 +342,13 @@ function RestaurantPage(props) {
       <RestaurantMenu restaurantId={restaurantToOpen.id} />
       <section id="reviews" className="reviews">
         <h2>Reviews</h2>
+        <button
+          type="button"
+          className="reviewCard"
+          onClick={() => props.onReview(props.selectedRestaurant)}
+        >
+          Review {restaurantToOpen.name}
+        </button>
         <div className="rating-ratingBars">
           <div className="ratingBox">
             <p>Overall rating ({restaurantToOpen.reviewsNumber})</p>
@@ -366,13 +373,19 @@ function RestaurantPage(props) {
         </div>
         {reviews.length === 0 && <p>No reviews yet.</p>}
         {reviews.map((review) => (
-          <div key={review._id}>
-            <h3>{review.title}</h3>
-            <Stars rating={review.rating} />
-            <p>
-              {review.userId?.fullName} Ordered: {review.whatIGot}
-            </p>
-            <p>{review.description}</p>
+          <div key={review._id} className="reviewItem">
+            <p className="reviewUser">{review.userId?.fullName}</p>
+            <div className="reviewRatingDate">
+              <Stars rating={review.rating} size="26px" />
+              <span className="reviewDate">
+                {new Date(review.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <p className="reviewText">{review.description}</p>
           </div>
         ))}
       </section>

@@ -1,73 +1,50 @@
 import React, { useState } from "react";
 
-const EMPTY_REVIEW = {
-  restaurantId: "",
-  rating: "",
-  timeVisited: "",
-  whatIGot: "",
-  title: "",
-  description: "",
-};
+const RATING_LABELS = ["Bad", "Not Great", "Ok", "Good", "Great"];
 
 function Form(props) {
-  const [review, setReview] = useState(EMPTY_REVIEW);
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setReview({ ...review, [name]: value });
-  }
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [description, setDescription] = useState("");
+
+  // The hovered star wins so the user sees a preview before clicking
+  const shownRating = hoverRating || rating;
+  const canPost = rating > 0 && description.trim() !== "";
+
   function submitForm() {
-    props.handleSubmit(review);
-    setReview(EMPTY_REVIEW);
+    props.handleSubmit({ rating, description });
   }
 
   return (
-    <form>
-      <label htmlFor="restaurantId">Restaurant</label>
-      <select name="restaurantId" id="restaurantId" value={review.restaurantId} onChange={handleChange}>
-        <option value="">-- Pick a restaurant --</option>
-        {props.restaurants.map((restaurant) => (
-          <option key={restaurant._id} value={restaurant._id}>
-            {restaurant.name}
-          </option>
+    <form className="reviewForm" onSubmit={(event) => event.preventDefault()}>
+      <h2>How would you rate your experience?</h2>
+      <div className="reviewStars" onMouseLeave={() => setHoverRating(0)}>
+        {[1, 2, 3, 4, 5].map((value) => (
+          <button
+            type="button"
+            key={value}
+            className={value <= shownRating ? "reviewStar reviewStarOn" : "reviewStar"}
+            aria-label={`${value} star${value > 1 ? "s" : ""}`}
+            onMouseEnter={() => setHoverRating(value)}
+            onClick={() => setRating(value)}
+          >
+            ★
+          </button>
         ))}
-      </select>
-      <label htmlFor="rating">Rating</label>
-      <input
-        type="number"
-        min="1"
-        max="5"
-        step="0.5"
-        name="rating"
-        id="rating"
-        value={review.rating}
-        onChange={handleChange}
-      />
-      <label htmlFor="timeVisited">Time visited</label>
-      <input
-        type="datetime-local"
-        name="timeVisited"
-        id="timeVisited"
-        value={review.timeVisited}
-        onChange={handleChange}
-      />
-      <label htmlFor="whatIGot">What I got</label>
-      <input
-        type="text"
-        name="whatIGot"
-        id="whatIGot"
-        value={review.whatIGot}
-        onChange={handleChange}
-      />
-      <label htmlFor="title">Review title</label>
-      <input type="text" name="title" id="title" value={review.title} onChange={handleChange} />
-      <label htmlFor="description">Experience / review description</label>
+        <span className="reviewStarLabel">{shownRating ? RATING_LABELS[shownRating - 1] : ""}</span>
+      </div>
+
+      <label htmlFor="description">Tell us about your experience</label>
       <textarea
         name="description"
         id="description"
-        value={review.description}
-        onChange={handleChange}
+        rows="10"
+        value={description}
+        onChange={(event) => setDescription(event.target.value)}
       />
-      <input type="button" value="Submit" onClick={submitForm} />
+      <button type="button" className="postReviewBtn" disabled={!canPost} onClick={submitForm}>
+        Post Review
+      </button>
     </form>
   );
 }

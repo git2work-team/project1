@@ -57,10 +57,8 @@ export function RestaurantPhotos() {
   );
 }
 
-// Write a review / Add photos
-
-//Checks whether the restaurant that the user is viewing is already saved
-export function RestaurantActions({restaurantId}) {
+// Write a review / Add photos / Save buttons
+export function RestaurantActions(props) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
     getSavedRestaurants(TEST_USER_ID)
@@ -99,9 +97,9 @@ export function RestaurantActions({restaurantId}) {
   }
   return (
     <div className="rx-actions">
-      <a className="rx-btn" href="/Review">
+      <button className="rx-btn" onClick={props.onReview}>
         Write a review
-      </a>
+      </button>
       {/* TODO: no photo upload yet, this button doesn't do anything */}
       <button className="rx-btn">Add photos</button>
       <button className={saved ? "rx-btn rx-btn-saved" : "rx-btn"} onClick={toggleSaved}>
