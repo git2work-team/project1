@@ -58,7 +58,7 @@ export function RestaurantPhotos() {
 }
 
 // Write a review / Add photos / Save buttons
-export function RestaurantActions(restaurantId) {
+export function RestaurantActions(props) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
     getSavedRestaurants(TEST_USER_ID)
@@ -69,7 +69,7 @@ export function RestaurantActions(restaurantId) {
         //if restaurant exists
         if (resturant) {
           //if saved restaurant's id matches the restaurant that the user is viewing
-          if (resturant._id === restaurantId) {
+          if (resturant._id === props.restaurantId) {
             isSaved = true;
             break
           }
@@ -80,14 +80,14 @@ export function RestaurantActions(restaurantId) {
     .catch((error) => {
       console.log("Could not load saved restaurant: ", error.message);
     });
-  }, [restaurantId]);
+  }, [props.restaurantId]);
 // Saves/unsaves the restaurant when a user is clicking a button
   async function toggleSaved() {
     try {
       if (saved) {
-        await unsaveRestaurant(TEST_USER_ID, restaurantId)
+        await unsaveRestaurant(TEST_USER_ID, props.restaurantId)
       } else {
-        await saveRestaurant(TEST_USER_ID, restaurantId)
+        await saveRestaurant(TEST_USER_ID, props.restaurantId)
       }
       setSaved(!saved)
     }

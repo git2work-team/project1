@@ -282,7 +282,8 @@ function RestaurantPage(props) {
       </div>
       <RestaurantPhotos />
       <RestaurantActions
-      restaurantId={props.selectedRestaurant._id}/>
+      restaurantId={props.selectedRestaurant._id}
+      onReview={() => props.onReview(props.selectedRestaurant)}/>
       <nav className="tabs">
         <a href="#overview">Overview</a>
         <a href="#location">Location</a>
