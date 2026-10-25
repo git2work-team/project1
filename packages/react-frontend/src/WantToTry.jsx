@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TEST_USER_ID } from "./config.js";
-import { getSavedRestaurants, saveRestaurant } from "./api.js";
+import { getSavedRestaurants, unsaveRestaurant} from "./api.js";
 import "./WantToTry.css";
 import RestaurantPage from "./RestaurantPage.jsx";
 
@@ -71,9 +71,18 @@ function WantToTry(props) {
     setSpots(updated);
   }
 
-  function removeSpot(id) {
-    setSpots(spots.filter((spot) => spot._id !== id));
-  }
+  async function removeSpot(id) {
+    try {
+      //Remove saved restaurant from MongoDB
+      await unsaveRestaurant(TEST_USER_ID, id);
+      //Remove restaurant from the "saved" screen
+      setSpots((currentSpots) => {
+        return currentSpots.filter((spot) => spot._id !== id)
+      });
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   const shown = spots.filter((spot) => {
     if (filter === "Deals") return spot.tag === "Deal";
