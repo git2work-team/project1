@@ -247,3 +247,13 @@ html {
   color: #5f5f5f;
   font-size: 17px;
 }
+
+.reviewPhoto {
+  width: 220px;
+  height: 200px;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 2px;
+  margin-top: 12px;
+}

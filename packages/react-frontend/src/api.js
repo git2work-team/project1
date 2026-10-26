@@ -63,3 +63,35 @@ export function unsaveRestaurant(userId, restaurantId) {
 export function getReviewsByRestaurant(restaurantId) {
   return request(`/reviews?restaurantId=${restaurantId}`);
 }
+
+//sends a photo to backend and returns upload result
+//throws an error in case of failure
+export async function uploadReviewPhoto(reviewId, file) {
+  //asks for a signature
+  const upload = await request("/photos-sign", {
+    method: "POST",
+  });
+  const body = new FormData();
+  body.append("file", file);
+  body.append("api_key", upload.api_key);
+  body.append("timestamp", upload.timestamp);
+  body.append("signature", upload.signature);
+  body.append("folder", upload.folder);
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${upload.cloud_name}/image/upload`,
+    {
+      method: "POST",
+      body,
+    }
+  );
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.error?.message || "Photo upload failed");
+  }
+  return request(`/reviews/${reviewId}/photos`, {
+    method: "POST",
+    body: JSON.stringify({
+      imageUrl: result.secure_url,
+    }),
+  });
+}
