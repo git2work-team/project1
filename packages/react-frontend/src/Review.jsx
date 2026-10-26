@@ -2,7 +2,7 @@ import React from "react";
 import "./Review.css";
 import Form from "./Form";
 import { TEST_USER_ID } from "./config";
-import { createReview } from "./api";
+import { createReview, uploadReviewPhoto } from "./api";
 
 function Review(props) {
   const restaurant = props.restaurant;
@@ -15,11 +15,17 @@ function Review(props) {
     );
   }
 
-  //Add a review (belongs to the test user), then go back to the restaurant page
-  function addReview(review) {
-    createReview({ ...review, userId: TEST_USER_ID, restaurantId: restaurant._id })
-      .then(props.onDone)
-      .catch((error) => console.log("Insert failed:", error.message));
+  //Add a review, upload photos (belongs to the test user), then go back to the restaurant page
+  async function addReview(review, photos) {
+    const createdReview = await createReview({
+      ...review,
+      userId: TEST_USER_ID,
+      restaurantId: restaurant._id,
+    });
+    for (const photo of photos) {
+      await uploadReviewPhoto(createdReview._id, photo);
+    }
+    props.onDone();
   }
 
   return (

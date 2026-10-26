@@ -3,130 +3,6 @@ import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
 import { getReviewsByRestaurant } from "./api.js";
 
-//Mock Restaurant data
-const mockRestaurants = [
-  {
-    id: 2,
-    name: "Firestone Grill",
-    address: "1001 Higuera St, San Luis Obispo, CA 93401",
-    rating: 4.5,
-    reviewsNumber: 12,
-    ratingCounts: { 5: 8, 4: 2, 3: 2, 2: 0, 1: 0 },
-    phone: "(620) 123-6781",
-    email: "firestone@gmail.com",
-    description:
-      "Located in the heart of downtown San Luis Obispo, Firestone Grill has been providing its customers with the best possible product at the best possible price since 1995. From our world-famous Tri-tip to our unmatched BBQ and burgers, we pride ourselves on delivering an unforgettable dining experience. We look forward to seeing you soon.",
-    dietaryOptions: "Vegetarian Gluten-free",
-    hours: [
-      "Monday: 9:00 AM – 5:00 PM",
-      "Tuesday: 9:00 AM – 5:00 PM",
-      "Wednesday: 9:00 AM – 5:00 PM",
-      "Thursday: 9:00 AM – 5:00 PM",
-      "Friday: 9:00 AM – 5:00 PM",
-      "Saturday: 12:00 PM – 7:00 PM",
-      "Sunday: 12:00 PM – 7:00 PM",
-    ].join("\n"),
-    avgPrice: "$",
-    website: "https://www.firestonegrill.com/locations/firestone-grill-san-luis-obispo/",
-  },
-  {
-    id: 1,
-    name: "Woodstock's Pizza",
-    address: "1000 Higuera St, San Luis Obispo, CA 93401",
-    rating: 4,
-    reviewsNumber: 224,
-    ratingCounts: { 5: 100, 4: 60, 3: 20, 2: 36, 1: 8 },
-    phone: "(213) 296-1111",
-    email: "woodstock@gmail.com",
-    description:
-      "Our mission is to earn loyal customers and team members who uniquely regard Woodstock’s as the Ultimate Pizza Experience.",
-    dietaryOptions: "Vegan Vegetarian",
-    hours: [
-      "Monday: 10:00 AM – 8:00 PM",
-      "Tuesday: 10:00 AM – 8:00 PM",
-      "Wednesday: 10:00 AM – 8:00 PM",
-      "Thursday: 10:00 AM – 8:00 PM",
-      "Friday: 10:00 AM – 8:00 PM",
-      "Saturday: 1:00 PM – 10:00 PM",
-      "Sunday: 1:00 PM – 10:00 PM",
-    ].join("\n"),
-    avgPrice: "$$",
-    website: "https://woodstocksslo.com/",
-  },
-  {
-    id: 3,
-    name: "Taqueria Santa Cruz",
-    address: "1308 Monterey St, San Luis Obispo, CA 93401",
-    rating: 4.6,
-    reviewsNumber: 27,
-    ratingCounts: { 5: 19, 4: 6, 3: 1, 2: 1, 1: 0 },
-    phone: "(805) 555-0143",
-    email: "taqueriasantacruz@gmail.com",
-    description:
-      "A small family-run taqueria close to campus with tacos, burritos, and a salsa bar. Popular with students because it is fast and cheap.",
-    dietaryOptions: "Vegetarian Gluten-free",
-    hours: [
-      "Monday: 9:00 AM – 9:00 PM",
-      "Tuesday: 9:00 AM – 9:00 PM",
-      "Wednesday: 9:00 AM – 9:00 PM",
-      "Thursday: 9:00 AM – 9:00 PM",
-      "Friday: 9:00 AM – 10:00 PM",
-      "Saturday: 9:00 AM – 10:00 PM",
-      "Sunday: 9:00 AM – 8:00 PM",
-    ].join("\n"),
-    avgPrice: "$",
-    website: "https://www.google.com/search?q=Taqueria+Santa+Cruz+San+Luis+Obispo",
-  },
-  {
-    id: 4,
-    name: "Scout Coffee",
-    address: "1130 Garden St, San Luis Obispo, CA 93401",
-    rating: 4.6,
-    reviewsNumber: 44,
-    ratingCounts: { 5: 30, 4: 11, 3: 2, 2: 1, 1: 0 },
-    phone: "(805) 555-0178",
-    email: "scoutcoffee@gmail.com",
-    description:
-      "A cozy downtown coffee shop with house-roasted coffee, homemade syrups, and pastries baked every morning. A lot of students come here to study.",
-    dietaryOptions: "Vegan Vegetarian",
-    hours: [
-      "Monday: 6:30 AM – 6:00 PM",
-      "Tuesday: 6:30 AM – 6:00 PM",
-      "Wednesday: 6:30 AM – 6:00 PM",
-      "Thursday: 6:30 AM – 6:00 PM",
-      "Friday: 6:30 AM – 6:00 PM",
-      "Saturday: 7:00 AM – 6:00 PM",
-      "Sunday: 7:00 AM – 6:00 PM",
-    ].join("\n"),
-    avgPrice: "$",
-    website: "https://www.scoutcoffeeco.com/",
-  },
-  {
-    id: 5,
-    name: "Big Sky Café",
-    address: "1121 Broad St, San Luis Obispo, CA 93401",
-    rating: 4.4,
-    reviewsNumber: 19,
-    ratingCounts: { 5: 11, 4: 6, 3: 1, 2: 1, 1: 0 },
-    phone: "(805) 555-0112",
-    email: "bigskycafe@gmail.com",
-    description:
-      "A downtown cafe known for brunch and fresh local ingredients, with a lot of vegetarian and vegan options. It gets busy on weekend mornings.",
-    dietaryOptions: "Vegan Vegetarian Gluten-free",
-    hours: [
-      "Monday: 8:00 AM – 8:00 PM",
-      "Tuesday: 8:00 AM – 8:00 PM",
-      "Wednesday: 8:00 AM – 8:00 PM",
-      "Thursday: 8:00 AM – 8:00 PM",
-      "Friday: 8:00 AM – 9:00 PM",
-      "Saturday: 8:00 AM – 9:00 PM",
-      "Sunday: 8:00 AM – 8:00 PM",
-    ].join("\n"),
-    avgPrice: "$$",
-    website: "https://bigskycafe.com/",
-  },
-];
-
 function Stars(props) {
   return (
     <span>
@@ -143,10 +19,12 @@ function Stars(props) {
           <span
             key={idx}
             style={{
+              display: "inline-block",
               fontSize: props.size || "20px",
-              background: `linear-gradient(to right, orange ${starFillPercentage}%, lightgray ${starFillPercentage}%)`,
+              backgroundImage: `linear-gradient(to right, orange ${starFillPercentage}%, lightgray ${starFillPercentage}%)`,
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               color: "transparent",
             }}
           >
@@ -247,11 +125,9 @@ function RestaurantPage(props) {
 
   const reviewSummary = summarizeReviews(reviews);
 
-  const restaurantToOpen = mockRestaurants.find(
-    (item) => item.id === props.selectedRestaurant.id
-  ) || {
-    dietaryOptions: "",
+  const restaurantToOpen = {
     ...props.selectedRestaurant,
+    dietaryOptions: props.selectedRestaurant.dietaryOptions || "",
     ...reviewSummary,
   };
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
@@ -282,8 +158,9 @@ function RestaurantPage(props) {
       </div>
       <RestaurantPhotos />
       <RestaurantActions
-      restaurantId={props.selectedRestaurant._id}
-      onReview={() => props.onReview(props.selectedRestaurant)}/>
+        restaurantId={props.selectedRestaurant._id}
+        onReview={() => props.onReview(props.selectedRestaurant)}
+      />
       <nav className="tabs">
         <a href="#overview">Overview</a>
         <a href="#location">Location</a>
@@ -360,13 +237,14 @@ function RestaurantPage(props) {
             {ratingPercentages.map((result) => {
               return (
                 <div key={result.number} className="ratingBarRow">
-                  <span>{result.roundedPercentage}%</span>
+                  <span className="ratingBarLabel">{result.number} star</span>
                   <div className="ratingBar">
                     <div
                       className="ratingBarToFill"
                       style={{ width: `${result.roundedPercentage}%` }}
                     ></div>
                   </div>
+                  <span className="ratingBarPercentage">{result.roundedPercentage}%</span>
                 </div>
               );
             })}
@@ -387,6 +265,14 @@ function RestaurantPage(props) {
               </span>
             </div>
             <p className="reviewText">{review.description}</p>
+            {review.photos?.map((photo) => (
+              <img
+                key={photo._id}
+                className="reviewPhoto"
+                src={photo.imageUrl}
+                alt="Photo attached to this review"
+              ></img>
+            ))}
           </div>
         ))}
       </section>

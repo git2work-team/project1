@@ -18,7 +18,19 @@ async function getReviews(req, res) {
     .populate("userId", "fullName")
     .populate("restaurantId", "name")
     .sort({ createdAt: -1 });
-  res.json(reviews);
+
+  //finds photos belonging to each review, combines them with that review and sends result to frontend
+  const reviewsWithPhotos = [];
+  for (const review of reviews) {
+    const photos = await ReviewPhoto.find({
+      reviewId: review._id,
+    }).sort({ uploadedAt: -1 });
+    reviewsWithPhotos.push({
+      ...review.toJSON(),
+      photos,
+    });
+  }
+  res.json(reviewsWithPhotos);
 }
 
 async function getReviewById(req, res) {
