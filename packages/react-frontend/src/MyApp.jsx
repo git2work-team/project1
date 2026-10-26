@@ -5,6 +5,8 @@ import Navbar from "./Navbar";
 import Homepage from "./Homepage";
 import RestaurantPage from "./RestaurantPage.jsx";
 import Browse from "./Browse";
+import Login from "./Login";
+import Signup from "./Signup";
 
 function MyApp() {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -33,6 +35,12 @@ function MyApp() {
       break;
     case "/":
       content = <Homepage />;
+      break;
+    case "/Login":
+      content = <Login />;
+      break;
+    case "/Signup":
+      content = <Signup />;
       break;
   }
 

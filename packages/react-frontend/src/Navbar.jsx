@@ -5,7 +5,17 @@ import WantToTry from "./WantToTry";
 import Review from "./Review";
 
 import "./Navbar.css";
+import { getCurrentUser, logOut } from "./auth";
+
 function Navbar() {
+  const user = getCurrentUser();
+
+  function handleLogOut(event) {
+    event.preventDefault();
+    logOut();
+    window.location.href = "/";
+  }
+
   return (
     <nav className="navbar">
       <a href="/" className="site-title">
@@ -18,6 +28,15 @@ function Navbar() {
         </li>
         <li>
           <a href="/WantToTry">Saved</a>
+        </li>
+        <li>
+          {user ? (
+            <a href="/" onClick={handleLogOut}>
+              Log out ({user.fullName})
+            </a>
+          ) : (
+            <a href="/Login">Log in</a>
+          )}
         </li>
       </ul>
     </nav>
