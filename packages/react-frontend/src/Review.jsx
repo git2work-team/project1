@@ -1,7 +1,7 @@
 import React from "react";
 import "./Review.css";
 import Form from "./Form";
-import { TEST_USER_ID } from "./config";
+import { getCurrentUser } from "./auth";
 import { createReview, uploadReviewPhoto } from "./api";
 
 function Review(props) {
@@ -17,9 +17,13 @@ function Review(props) {
 
   //Add a review, upload photos (belongs to the test user), then go back to the restaurant page
   async function addReview(review, photos) {
+    const user = getCurrentUser();
+    if (!user) {
+      return;
+    }
     const createdReview = await createReview({
       ...review,
-      userId: TEST_USER_ID,
+      userId: user._id,
       restaurantId: restaurant._id,
     });
     for (const photo of photos) {

@@ -7,19 +7,27 @@ import RestaurantPage from "./RestaurantPage.jsx";
 import Browse from "./Browse";
 import Login from "./Login";
 import Signup from "./Signup";
+import { getCurrentUser } from "./auth.js";
 
 function MyApp() {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  // Set while the user is writing a review; shows the Review page for that restaurant
+  const [reviewingRestaurant, setReviewingRestaurant] = useState(null);
 
   function openRestaurant(restaurant) {
     setSelectedRestaurant(restaurant);
   }
 
-  // Set while the user is writing a review; shows the Review page for that restaurant
-  const [reviewingRestaurant, setReviewingRestaurant] = useState(null);
+  function startReview(restaurant) {
+    if (!getCurrentUser()) {
+      window.location.href = "/Login";
+      return;
+    }
+    setReviewingRestaurant(restaurant);
+  }
 
   const restaurantPage = selectedRestaurant && (
-    <RestaurantPage selectedRestaurant={selectedRestaurant} onReview={setReviewingRestaurant} />
+    <RestaurantPage selectedRestaurant={selectedRestaurant} onReview={startReview} />
   );
 
   let content;

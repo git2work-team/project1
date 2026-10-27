@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { TEST_USER_ID } from "./config.js";
-import { getSavedRestaurants, unsaveRestaurant} from "./api.js";
+import { getCurrentUser } from "./auth.js";
+import { getSavedRestaurants, unsaveRestaurant } from "./api.js";
 import "./WantToTry.css";
 import RestaurantPage from "./RestaurantPage.jsx";
 
@@ -48,14 +48,17 @@ function WantToTry(props) {
   const [spots, setSpots] = useState([]);
   const [filter, setFilter] = useState("All");
   const [error, setError] = useState("");
+  const user = getCurrentUser();
   useEffect(() => {
-    getSavedRestaurants(TEST_USER_ID)
+    if (!user) {
+      window.location.href = "/Login";
+      return;
+    }
+    getSavedRestaurants(user._id)
       .then((data) => {
         console.log("Saved restaurants: ", data);
-        const restaurants = data
-        .map((saved) => saved.restaurantId)
-        .filter(Boolean);
-        setSpots(restaurants)
+        const restaurants = data.map((saved) => saved.restaurantId).filter(Boolean);
+        setSpots(restaurants);
       })
       .catch((error) => {
         setError(error.message);
@@ -74,15 +77,19 @@ function WantToTry(props) {
   async function removeSpot(id) {
     try {
       //Remove saved restaurant from MongoDB
-      await unsaveRestaurant(TEST_USER_ID, id);
+      await unsaveRestaurant(user._id, id);
       //Remove restaurant from the "saved" screen
       setSpots((currentSpots) => {
-        return currentSpots.filter((spot) => spot._id !== id)
+        return currentSpots.filter((spot) => spot._id !== id);
       });
     } catch (error) {
       setError(error.message);
     }
-  };
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const shown = spots.filter((spot) => {
     if (filter === "Deals") return spot.tag === "Deal";
