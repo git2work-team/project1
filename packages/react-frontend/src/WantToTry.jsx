@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TEST_USER_ID } from "./config.js";
+import { getCurrentUser } from "./auth.js";
 import { getSavedRestaurants, unsaveRestaurant} from "./api.js";
 import "./WantToTry.css";
 import RestaurantPage from "./RestaurantPage.jsx";
@@ -48,8 +48,14 @@ function WantToTry(props) {
   const [spots, setSpots] = useState([]);
   const [filter, setFilter] = useState("All");
   const [error, setError] = useState("");
+  const user = getCurrentUser();
+  const userId = user ? user._id : null;
   useEffect(() => {
-    getSavedRestaurants(TEST_USER_ID)
+    // Nobody logged in, so there is no list to load
+    if (!userId) {
+      return;
+    }
+    getSavedRestaurants(userId)
       .then((data) => {
         console.log("Saved restaurants: ", data);
         const restaurants = data
@@ -60,7 +66,7 @@ function WantToTry(props) {
       .catch((error) => {
         setError(error.message);
       });
-  }, []);
+  }, [userId]);
   function toggleTried(id) {
     const updated = spots.map((spot) => {
       if (spot._id === id) {
@@ -74,7 +80,7 @@ function WantToTry(props) {
   async function removeSpot(id) {
     try {
       //Remove saved restaurant from MongoDB
-      await unsaveRestaurant(TEST_USER_ID, id);
+      await unsaveRestaurant(userId, id);
       //Remove restaurant from the "saved" screen
       setSpots((currentSpots) => {
         return currentSpots.filter((spot) => spot._id !== id)
@@ -83,6 +89,17 @@ function WantToTry(props) {
       setError(error.message);
     }
   };
+
+  if (!userId) {
+    return (
+      <div className="wtt-page">
+        <h1>My Want-to-Try List</h1>
+        <p className="wtt-empty">
+          Please <a href="/Login">log in</a> to see your saved places.
+        </p>
+      </div>
+    );
+  }
 
   const shown = spots.filter((spot) => {
     if (filter === "Deals") return spot.tag === "Deal";
