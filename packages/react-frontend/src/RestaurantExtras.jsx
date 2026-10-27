@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./RestaurantExtras.css";
 import { getSavedRestaurants, saveRestaurant, unsaveRestaurant } from "./api";
-import { TEST_USER_ID } from "./config";
+import { getCurrentUser } from "./auth";
 // Placeholder menus for now, matched to the mock restaurants by id.
 // Later this should come from the menu-items route.
 const mockMenus = {
@@ -60,8 +60,14 @@ export function RestaurantPhotos() {
 // Write a review / Add photos / Save buttons
 export function RestaurantActions(props) {
   const [saved, setSaved] = useState(false);
+  const user = getCurrentUser();
+  const userId = user ? user._id : null;
   useEffect(() => {
-    getSavedRestaurants(TEST_USER_ID)
+    // Nobody logged in, so nothing is saved
+    if (!userId) {
+      return;
+    }
+    getSavedRestaurants(userId)
     .then((data) => {
       let isSaved = false;
       for (const entry of data) {
@@ -80,14 +86,19 @@ export function RestaurantActions(props) {
     .catch((error) => {
       console.log("Could not load saved restaurant: ", error.message);
     });
-  }, [props.restaurantId]);
+  }, [props.restaurantId, userId]);
 // Saves/unsaves the restaurant when a user is clicking a button
   async function toggleSaved() {
+    // Need an account to save, so send them to log in
+    if (!userId) {
+      window.location.href = "/Login";
+      return;
+    }
     try {
       if (saved) {
-        await unsaveRestaurant(TEST_USER_ID, props.restaurantId)
+        await unsaveRestaurant(userId, props.restaurantId)
       } else {
-        await saveRestaurant(TEST_USER_ID, props.restaurantId)
+        await saveRestaurant(userId, props.restaurantId)
       }
       setSaved(!saved)
     }
