@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getRestaurants } from "./api.js";
+import RestaurantCard from "./RestaurantCard";
 
 function Browse(props) {
   const [restaurants, setRestaurants] = useState([]);
@@ -11,25 +12,23 @@ function Browse(props) {
   }, []);
 
   return (
-    <div>
-      <h1>Browse Restaurants</h1>
-      {restaurants.map((restaurant) => {
-        return (
-          <div
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <h1 style={{ marginBottom: "20px", color: "#00000" }}>Browse Restaurants</h1>
+      <div 
+        style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(2, 1fr)", 
+          gap: "20px" 
+        }}
+      >
+        {restaurants.map((restaurant) => (
+          <RestaurantCard
             key={restaurant._id}
+            restaurant={restaurant}
             onClick={() => props.openRestaurant(restaurant)}
-            style={{
-              border: "1px solid gray",
-              padding: "12px",
-              margin: "8px 0",
-              cursor: "pointer",
-            }}
-          >
-            <h3>{restaurant.name}</h3>
-            <p>{restaurant.address}</p>
-          </div>
-        );
-      })}
+          />
+        ))}
+      </div>
     </div>
   );
 }

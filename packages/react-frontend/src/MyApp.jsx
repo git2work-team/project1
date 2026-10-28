@@ -42,7 +42,7 @@ function MyApp() {
       content = restaurantPage || <WantToTry openRestaurant={openRestaurant} />;
       break;
     case "/":
-      content = <Homepage />;
+      content = restaurantPage || <Homepage openRestaurant={openRestaurant} />;
       break;
     case "/Login":
       content = <Login />;

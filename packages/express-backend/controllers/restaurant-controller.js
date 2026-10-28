@@ -6,8 +6,41 @@ async function createRestaurant(req, res) {
 }
 
 async function getRestaurants(req, res) {
-  const restaurants = await Restaurant.find().sort({ name: 1 });
-  res.json(restaurants);
+  //will also calculate the total rating here
+  try {
+    const restaurants = await Restaurant.aggregate([
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "restaurantId",
+          as: "reviewsList",
+        },
+      },
+      {
+        $addFields: {
+          reviewsNumber: { $size: "$reviewsList" },
+          rating: {
+            $cond: {
+              if: { $eq: [{ $size: "$reviewsList" }, 0] },
+              then: 0,
+              else: { $avg: "$reviewsList.rating" },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          reviewsList: 0,
+        },
+      },
+      { $sort: { name: 1 } },
+    ]);
+
+    res.json(restaurants);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 }
 
 async function getRestaurantById(req, res) {
