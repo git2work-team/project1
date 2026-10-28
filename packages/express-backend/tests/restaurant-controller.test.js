@@ -28,16 +28,32 @@ describe("createRestaurant", () => {
 });
 
 describe("getRestaurants", () => {
-  test("returns all restaurants sorted by name", async () => {
-    const restaurants = [{ name: "A Place" }, { name: "B Place" }];
-    const fakeSort = jest.fn().mockResolvedValue(restaurants);
-    jest.spyOn(Restaurant, "find").mockReturnValue({ sort: fakeSort });
+  test("returns all restaurants with ratings, sorted by name", async () => {
+    const restaurants = [
+      { name: "A Place", rating: 4, reviewsNumber: 2 },
+      { name: "B Place", rating: 0, reviewsNumber: 0 },
+    ];
+    jest.spyOn(Restaurant, "aggregate").mockResolvedValue(restaurants);
     const res = mockRes();
 
-    await restaurantController.getRestaurants({}, res);
+    await restaurantController.getRestaurants({ query: {} }, res);
 
-    expect(fakeSort).toHaveBeenCalledWith({ name: 1 });
+    const pipeline = Restaurant.aggregate.mock.calls[0][0];
+    expect(pipeline[0]).toEqual({ $match: {} });
+    expect(pipeline[pipeline.length - 1]).toEqual({ $sort: { name: 1 } });
     expect(res.json).toHaveBeenCalledWith(restaurants);
+  });
+
+  test("filters by the search text", async () => {
+    jest.spyOn(Restaurant, "aggregate").mockResolvedValue([]);
+    const res = mockRes();
+
+    await restaurantController.getRestaurants({ query: { search: "taco" } }, res);
+
+    const match = Restaurant.aggregate.mock.calls[0][0][0].$match;
+    expect(match.$or).toHaveLength(4);
+    expect(match.$or[0].name.test("Taco Spot")).toBe(true);
+    expect(res.json).toHaveBeenCalledWith([]);
   });
 });
 
