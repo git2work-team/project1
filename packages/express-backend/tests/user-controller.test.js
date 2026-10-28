@@ -75,6 +75,67 @@ describe("createUser", () => {
   });
 });
 
+describe("loginUser", () => {
+  // findOne(...).select(...) is a chain, so the fake findOne returns an object with select
+  function mockFindOne(user) {
+    const select = jest.fn().mockResolvedValue(user);
+    jest.spyOn(User, "findOne").mockReturnValue({ select });
+    return select;
+  }
+
+  test("returns the user when the password is correct", async () => {
+    const user = { _id: "1", fullName: "A", passwordHash: "hashed!" };
+    const select = mockFindOne(user);
+    jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
+    const req = { body: { email: " A@B.com ", password: "longenough" } };
+    const res = mockRes();
+
+    await userController.loginUser(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: "a@b.com" });
+    expect(select).toHaveBeenCalledWith("+passwordHash");
+    expect(bcrypt.compare).toHaveBeenCalledWith("longenough", "hashed!");
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith(user);
+  });
+
+  test("returns 401 when the password is wrong", async () => {
+    mockFindOne({ _id: "1", passwordHash: "hashed!" });
+    jest.spyOn(bcrypt, "compare").mockResolvedValue(false);
+    const req = { body: { email: "a@b.com", password: "wrongpassword" } };
+    const res = mockRes();
+
+    await userController.loginUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ error: "Incorrect email or password" });
+  });
+
+  test("returns 401 when no account has that email", async () => {
+    mockFindOne(null);
+    const compareSpy = jest.spyOn(bcrypt, "compare");
+    const req = { body: { email: "nobody@b.com", password: "longenough" } };
+    const res = mockRes();
+
+    await userController.loginUser(req, res);
+
+    expect(compareSpy).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ error: "Incorrect email or password" });
+  });
+
+  test("returns 400 when the email or password is missing", async () => {
+    const findSpy = jest.spyOn(User, "findOne");
+    const res = mockRes();
+
+    await userController.loginUser({ body: { email: "a@b.com" } }, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Email and password are required" });
+    expect(findSpy).not.toHaveBeenCalled();
+  });
+});
+
 describe("getUserById", () => {
   test("returns the user when found", async () => {
     const user = { _id: "1", fullName: "A" };
