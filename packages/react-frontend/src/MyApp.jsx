@@ -13,9 +13,16 @@ function MyApp() {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   // Set while the user is writing a review; shows the Review page for that restaurant
   const [reviewingRestaurant, setReviewingRestaurant] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
 
   function openRestaurant(restaurant) {
     setSelectedRestaurant(restaurant);
+  }
+
+  function handleHomepageSearch(query) {
+    setSearchQuery(query);
+    window.history.pushState({}, "", "/Browse");
   }
 
   function startReview(restaurant) {
@@ -33,7 +40,7 @@ function MyApp() {
   let content;
   switch (window.location.pathname) {
     case "/Browse":
-      content = restaurantPage || <Browse openRestaurant={openRestaurant} />;
+      content = restaurantPage || (<Browse openRestaurant={openRestaurant} initialSearch={searchQuery} />);
       break;
     case "/Review":
       content = restaurantPage || <Review restaurant={null} />;
@@ -42,7 +49,7 @@ function MyApp() {
       content = restaurantPage || <WantToTry openRestaurant={openRestaurant} />;
       break;
     case "/":
-      content = restaurantPage || <Homepage openRestaurant={openRestaurant} />;
+      content = restaurantPage || (<Homepage openRestaurant={openRestaurant} onSearch={handleHomepageSearch}/>);
       break;
     case "/Login":
       content = <Login />;

@@ -8,7 +8,25 @@ async function createRestaurant(req, res) {
 async function getRestaurants(req, res) {
   //will also calculate the total rating here
   try {
+    const { search, cuisine } = req.query;
+    const matchFilter = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); 
+      matchFilter.$or = [
+        { name: searchRegex },
+        { address: searchRegex },
+        { description: searchRegex },
+        { cuisineLabel: searchRegex },
+      ];
+    }
+
+    if (cuisine) {
+      matchFilter.cuisine = { $regex: new RegExp(cuisine, "i") };
+    }
+
     const restaurants = await Restaurant.aggregate([
+      { $match: matchFilter },
       {
         $lookup: {
           from: "reviews",
@@ -42,6 +60,8 @@ async function getRestaurants(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
+
 
 async function getRestaurantById(req, res) {
   const restaurant = await Restaurant.findById(req.params.id);
