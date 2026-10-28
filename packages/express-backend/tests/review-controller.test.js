@@ -12,11 +12,14 @@ afterEach(() => {
 
 describe("getReviews", () => {
   test("filters by restaurantId and userId from the query string", async () => {
-    const reviews = [{ title: "Great" }];
+    const reviews = [{ _id: "rev1", toJSON: () => ({ _id: "rev1", title: "Great" }) }];
     const fakeSort = jest.fn().mockResolvedValue(reviews);
     const fakePopulate2 = jest.fn().mockReturnValue({ sort: fakeSort });
     const fakePopulate1 = jest.fn().mockReturnValue({ populate: fakePopulate2 });
     jest.spyOn(Review, "find").mockReturnValue({ populate: fakePopulate1 });
+    // getReviews also loads each review's photos
+    const fakePhotoSort = jest.fn().mockResolvedValue([{ url: "photo.jpg" }]);
+    jest.spyOn(ReviewPhoto, "find").mockReturnValue({ sort: fakePhotoSort });
     const req = {
       query: {
         restaurantId: "r1",
@@ -31,7 +34,10 @@ describe("getReviews", () => {
     expect(fakePopulate1).toHaveBeenCalledWith("userId", "fullName");
     expect(fakePopulate2).toHaveBeenCalledWith("restaurantId", "name");
     expect(fakeSort).toHaveBeenCalledWith({ createdAt: -1 });
-    expect(res.json).toHaveBeenCalledWith(reviews);
+    expect(ReviewPhoto.find).toHaveBeenCalledWith({ reviewId: "rev1" });
+    expect(res.json).toHaveBeenCalledWith([
+      { _id: "rev1", title: "Great", photos: [{ url: "photo.jpg" }] },
+    ]);
   });
 
   test("uses an empty filter when no query params are given", async () => {
