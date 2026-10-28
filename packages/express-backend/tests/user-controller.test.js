@@ -49,6 +49,30 @@ describe("createUser", () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({ _id: "1", fullName: "A" });
   });
+
+  test("returns 409 when the email is already used", async () => {
+    jest.spyOn(bcrypt, "hash").mockResolvedValue("hashed!");
+    jest.spyOn(User, "create").mockRejectedValue({ code: 11000 });
+    const req = { body: { fullName: "A", email: "a@b.com", password: "longenough" } };
+    const res = mockRes();
+
+    await userController.createUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({ error: "An account with this email already exists" });
+  });
+
+  test("returns 400 when the name or email is missing", async () => {
+    jest.spyOn(bcrypt, "hash").mockResolvedValue("hashed!");
+    jest.spyOn(User, "create").mockRejectedValue({ name: "ValidationError" });
+    const req = { body: { password: "longenough" } };
+    const res = mockRes();
+
+    await userController.createUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Please fill in your name and a valid email" });
+  });
 });
 
 describe("getUserById", () => {
