@@ -107,8 +107,10 @@ export function RestaurantActions(props) {
       <button className="rx-btn" onClick={props.onReview}>
         Write a review
       </button>
-      {/* TODO: no photo upload yet, this button doesn't do anything */}
-      <button className="rx-btn">Add photos</button>
+      {/* Photos are uploaded with a review, so this opens the review form */}
+      <button className="rx-btn" onClick={props.onReview}>
+        Add photos
+      </button>
       <button className={saved ? "rx-btn rx-btn-saved" : "rx-btn"} onClick={toggleSaved}>
         {saved ? "Saved ✓" : "Save"}
       </button>
