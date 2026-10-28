@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   background-color: #d3d3d3;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2rem;
   border-radius: 4px;
   width: 100%;
   max-width: 650px;
@@ -34,6 +34,7 @@
   width: 100%;
   font-size: 1rem;
   outline: none;
+  margin-top: 0.5rem;
 }
 
 .main-banner {

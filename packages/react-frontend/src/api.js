@@ -33,8 +33,20 @@ export function loginUser(email, password) {
 
 // ---------- Restaurants (restaurant-routes.js) ----------
 
-export function getRestaurants() {
-  return request("/restaurants");
+export function getRestaurants(filters = {}) {
+  const queryParams = new URLSearchParams();
+
+  if (filters.search) {
+    queryParams.append("search", filters.search);
+  }
+  if (filters.cuisine) {
+    queryParams.append("cuisine", filters.cuisine);
+  }
+
+  const queryString = queryParams.toString();
+  const path = queryString ? `/restaurants?${queryString}` : "/restaurants";
+
+  return request(path);
 }
 
 // ---------- Reviews (review-routes.js) ----------

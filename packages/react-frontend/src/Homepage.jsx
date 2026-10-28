@@ -15,6 +15,7 @@ function Homepage(props) {
   
   const [currentSlide, setCurrentSlide] = useState(0);
   const [restaurants, setRestaurants] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   //fetch restaurants from the backend
   useEffect(() => {
@@ -29,6 +30,15 @@ function Homepage(props) {
       })
       .catch((error) => console.log("Error fetching top restaurants:", error.message));
   }, []);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    if(props.onSearch) {
+      props.onSearch(searchQuery);
+    }
+  }
 
   // auto-rotate slides
   useEffect(() => {
@@ -53,13 +63,14 @@ function Homepage(props) {
     );
   };
 
+
   //if data is still loading
   if (restaurants.length === 0) {
     return (
       <div className="homepage-container">
         <div className="search-section">
           <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"></span>
             <input type="text" className="search-input" placeholder="Search restaurants, cuisines..." disabled />
           </div>
         </div>
@@ -77,15 +88,16 @@ function Homepage(props) {
     <div className="homepage-container">
       
       <div className="search-section">
-        <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+        <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
+          <span className="search-icon"></span>
           <input
             type="text"
             className="search-input"
             placeholder="Search restaurants, cuisines..."
-            disabled
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
+        </form>
       </div>
 
       <div className="main-banner">
