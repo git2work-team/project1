@@ -128,6 +128,7 @@ describe("createReview", () => {
   test("creates the review with only the allowed fields and returns 201", async () => {
     jest.spyOn(User, "exists").mockResolvedValue({ _id: "u1" });
     jest.spyOn(Restaurant, "exists").mockResolvedValue({ _id: "r1" });
+    jest.spyOn(Review, "exists").mockResolvedValue(null);
     const created = { _id: "rev1", ...body };
     jest.spyOn(Review, "create").mockResolvedValue(created);
     const res = mockRes();

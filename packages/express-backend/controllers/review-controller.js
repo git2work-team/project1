@@ -58,13 +58,26 @@ async function createReview(req, res) {
     return res.status(404).json({ error: "Restaurant not found" });
   }
 
-  const review = await Review.create({
-    userId,
-    restaurantId,
-    rating,
-    description,
-  });
-  res.status(201).json(review);
+  const alreadyReviewed = await Review.exists({ userId, restaurantId });
+  if (alreadyReviewed) {
+    return res.status(409).json({ error: "You already reviewed this restaurant" });
+  }
+
+  try {
+    const review = await Review.create({
+      userId,
+      restaurantId,
+      rating,
+      description,
+    });
+    res.status(201).json(review);
+  } catch (error) {
+    // 11000 = duplicate key, two requests for the same review came in at the same time
+    if (error.code === 11000) {
+      return res.status(409).json({ error: "You already reviewed this restaurant" });
+    }
+    throw error;
+  }
 }
 
 async function updateReview(req, res) {
