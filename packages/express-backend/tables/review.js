@@ -33,6 +33,8 @@ const ReviewSchema = new mongoose.Schema(
 
 ReviewSchema.index({ restaurantId: 1, createdAt: -1 });
 ReviewSchema.index({ userId: 1, createdAt: -1 });
+// One review per user per restaurant
+ReviewSchema.index({ userId: 1, restaurantId: 1 }, { unique: true });
 
 const Review = mongoose.model("Review", ReviewSchema);
 

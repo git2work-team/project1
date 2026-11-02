@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Review.css";
 import Form from "./Form";
 import { getCurrentUser } from "./auth";
@@ -6,6 +6,7 @@ import { createReview, uploadReviewPhoto } from "./api";
 
 function Review(props) {
   const restaurant = props.restaurant;
+  const [error, setError] = useState("");
 
   if (!restaurant) {
     return (
@@ -21,21 +22,28 @@ function Review(props) {
     if (!user) {
       return;
     }
-    const createdReview = await createReview({
-      ...review,
-      userId: user._id,
-      restaurantId: restaurant._id,
-    });
-    for (const photo of photos) {
-      await uploadReviewPhoto(createdReview._id, photo);
+    setError("");
+    try {
+      const createdReview = await createReview({
+        ...review,
+        userId: user._id,
+        restaurantId: restaurant._id,
+      });
+      for (const photo of photos) {
+        await uploadReviewPhoto(createdReview._id, photo);
+      }
+      props.onDone();
+    } catch (err) {
+      // e.g. "You already reviewed this restaurant" from the backend
+      setError(err.message);
     }
-    props.onDone();
   }
 
   return (
     <div className="container reviewPage">
       <h1 className="reviewRestaurantName">{restaurant.name}</h1>
       <p className="reviewRestaurantAddress">{restaurant.address}</p>
+      {error && <p className="reviewError">{error}</p>}
       <Form handleSubmit={addReview} />
     </div>
   );
