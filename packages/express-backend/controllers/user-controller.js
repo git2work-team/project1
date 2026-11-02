@@ -1,8 +1,15 @@
 import bcrypt from "bcryptjs";
 import User from "../tables/user.js";
+import jwt from "jsonwebtoken";
 
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
+
+function createToken(user) {
+  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+  });
+}
 
 async function createUser(req, res) {
   const { fullName, email, password } = req.body;
@@ -16,7 +23,7 @@ async function createUser(req, res) {
 
   try {
     const user = await User.create({ fullName, email, passwordHash });
-    res.status(201).json(user);
+    res.status(201).json({ token: createToken(user), user });
   } catch (error) {
     // 11000 = duplicate key, the email is already used by another account
     if (error.code === 11000) {
@@ -44,7 +51,7 @@ async function loginUser(req, res) {
   if (!passwordMatches) {
     return res.status(401).json({ error: "Incorrect email or password" });
   }
-  res.json(user);
+  res.json({ token: createToken(user), user });
 }
 
 async function getUserById(req, res) {

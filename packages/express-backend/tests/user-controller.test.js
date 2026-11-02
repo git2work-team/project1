@@ -4,6 +4,8 @@ import User from "../tables/user.js";
 import userController from "../controllers/user-controller.js";
 import { mockRes } from "./helper/mock-res.js";
 
+process.env.JWT_SECRET = "test-secret";
+
 afterEach(() => {
   jest.restoreAllMocks();
 });
@@ -47,7 +49,10 @@ describe("createUser", () => {
       passwordHash: "hashed!",
     });
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ _id: "1", fullName: "A" });
+    expect(res.json).toHaveBeenCalledWith({
+      token: expect.any(String),
+      user: { _id: "1", fullName: "A" },
+    });
   });
 
   test("returns 409 when the email is already used", async () => {
@@ -96,7 +101,7 @@ describe("loginUser", () => {
     expect(select).toHaveBeenCalledWith("+passwordHash");
     expect(bcrypt.compare).toHaveBeenCalledWith("longenough", "hashed!");
     expect(res.status).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith(user);
+    expect(res.json).toHaveBeenCalledWith({ token: expect.any(String), user });
   });
 
   test("returns 401 when the password is wrong", async () => {
