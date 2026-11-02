@@ -139,6 +139,34 @@ describe("createReview", () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(created);
   });
+
+  test("returns 409 when the user already reviewed the restaurant", async () => {
+    jest.spyOn(User, "exists").mockResolvedValue({ _id: "u1" });
+    jest.spyOn(Restaurant, "exists").mockResolvedValue({ _id: "r1" });
+    jest.spyOn(Review, "exists").mockResolvedValue({ _id: "rev1" });
+    const createSpy = jest.spyOn(Review, "create");
+    const res = mockRes();
+
+    await reviewController.createReview({ body }, res);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({ error: "You already reviewed this restaurant" });
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  test("returns 409 when the database rejects a duplicate review", async () => {
+    jest.spyOn(User, "exists").mockResolvedValue({ _id: "u1" });
+    jest.spyOn(Restaurant, "exists").mockResolvedValue({ _id: "r1" });
+    // Both requests pass the exists check, then the unique index blocks the second one
+    jest.spyOn(Review, "exists").mockResolvedValue(null);
+    jest.spyOn(Review, "create").mockRejectedValue({ code: 11000 });
+    const res = mockRes();
+
+    await reviewController.createReview({ body }, res);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({ error: "You already reviewed this restaurant" });
+  });
 });
 
 describe("updateReview", () => {
