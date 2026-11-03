@@ -26,7 +26,6 @@ function Review(props) {
     try {
       const createdReview = await createReview({
         ...review,
-        userId: user._id,
         restaurantId: restaurant._id,
       });
       for (const photo of photos) {

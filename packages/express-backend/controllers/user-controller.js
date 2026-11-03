@@ -55,6 +55,10 @@ async function loginUser(req, res) {
 }
 
 async function getUserById(req, res) {
+  if (req.params.id !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own account" });
+  }
+
   const user = await User.findById(req.params.id);
   if (!user) {
     return res.status(404).json({ error: "User not found" });
@@ -63,6 +67,10 @@ async function getUserById(req, res) {
 }
 
 async function updateUser(req, res) {
+  if (req.params.id !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own account" });
+  }
+
   const { fullName, email } = req.body;
 
   const user = await User.findByIdAndUpdate(
@@ -80,6 +88,10 @@ async function updateUser(req, res) {
 }
 
 async function deleteUser(req, res) {
+  if (req.params.id !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own account" });
+  }
+
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) {
     return res.status(404).json({ error: "User not found" });

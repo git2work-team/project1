@@ -16,6 +16,7 @@ describe("getSavedRestaurants", () => {
       params: {
         userId: "u1",
       },
+      user: { id: "u1" },
     };
     const res = mockRes();
 
@@ -31,7 +32,7 @@ describe("getSavedRestaurants", () => {
     const fakeSort = jest.fn().mockResolvedValue(saved);
     const fakePopulate = jest.fn().mockReturnValue({ sort: fakeSort });
     jest.spyOn(SavedRestaurant, "find").mockReturnValue({ populate: fakePopulate });
-    const req = { params: { userId: "u1" } };
+    const req = { params: { userId: "u1" }, user: { id: "u1" } };
     const res = mockRes();
 
     await savedRestaurantController.getSavedRestaurants(req, res);
@@ -41,13 +42,24 @@ describe("getSavedRestaurants", () => {
     expect(fakeSort).toHaveBeenCalledWith({ savedAt: -1 });
     expect(res.json).toHaveBeenCalledWith(saved);
   });
+
+  test("returns 403 when reading someone else's saved restaurants", async () => {
+    const findSpy = jest.spyOn(SavedRestaurant, "find");
+    const req = { params: { userId: "otherUser" }, user: { id: "u1" } };
+    const res = mockRes();
+
+    await savedRestaurantController.getSavedRestaurants(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(findSpy).not.toHaveBeenCalled();
+  });
 });
 
 describe("saveRestaurant", () => {
   test("returns 404 and does not save when the user does not exist", async () => {
     jest.spyOn(User, "exists").mockResolvedValue(null);
     const createSpy = jest.spyOn(SavedRestaurant, "create");
-    const req = { params: { userId: "u1" }, body: { restaurantId: "r1" } };
+    const req = { params: { userId: "u1" }, user: { id: "u1" }, body: { restaurantId: "r1" } };
     const res = mockRes();
 
     await savedRestaurantController.saveRestaurant(req, res);
@@ -61,7 +73,7 @@ describe("saveRestaurant", () => {
     jest.spyOn(User, "exists").mockResolvedValue({ _id: "u1" });
     jest.spyOn(Restaurant, "exists").mockResolvedValue(null);
     const createSpy = jest.spyOn(SavedRestaurant, "create");
-    const req = { params: { userId: "u1" }, body: { restaurantId: "r1" } };
+    const req = { params: { userId: "u1" }, user: { id: "u1" }, body: { restaurantId: "r1" } };
     const res = mockRes();
 
     await savedRestaurantController.saveRestaurant(req, res);
@@ -76,7 +88,7 @@ describe("saveRestaurant", () => {
     jest.spyOn(Restaurant, "exists").mockResolvedValue({ _id: "r1" });
     const created = { _id: "1", userId: "u1", restaurantId: "r1" };
     jest.spyOn(SavedRestaurant, "create").mockResolvedValue(created);
-    const req = { params: { userId: "u1" }, body: { restaurantId: "r1" } };
+    const req = { params: { userId: "u1" }, user: { id: "u1" }, body: { restaurantId: "r1" } };
     const res = mockRes();
 
     await savedRestaurantController.saveRestaurant(req, res);
@@ -85,12 +97,27 @@ describe("saveRestaurant", () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(created);
   });
+
+  test("returns 403 and does not save to someone else's list", async () => {
+    const createSpy = jest.spyOn(SavedRestaurant, "create");
+    const req = {
+      params: { userId: "otherUser" },
+      user: { id: "u1" },
+      body: { restaurantId: "r1" },
+    };
+    const res = mockRes();
+
+    await savedRestaurantController.saveRestaurant(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(createSpy).not.toHaveBeenCalled();
+  });
 });
 
 describe("unsaveRestaurant", () => {
   test("returns 204 on success", async () => {
     jest.spyOn(SavedRestaurant, "findOneAndDelete").mockResolvedValue({ _id: "1" });
-    const req = { params: { userId: "u1", restaurantId: "r1" } };
+    const req = { params: { userId: "u1", restaurantId: "r1" }, user: { id: "u1" } };
     const res = mockRes();
 
     await savedRestaurantController.unsaveRestaurant(req, res);
@@ -105,12 +132,23 @@ describe("unsaveRestaurant", () => {
 
   test("returns 404 when the restaurant was not saved", async () => {
     jest.spyOn(SavedRestaurant, "findOneAndDelete").mockResolvedValue(null);
-    const req = { params: { userId: "u1", restaurantId: "r1" } };
+    const req = { params: { userId: "u1", restaurantId: "r1" }, user: { id: "u1" } };
     const res = mockRes();
 
     await savedRestaurantController.unsaveRestaurant(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "Saved restaurant not found" });
+  });
+
+  test("returns 403 and does not delete from someone else's list", async () => {
+    const deleteSpy = jest.spyOn(SavedRestaurant, "findOneAndDelete");
+    const req = { params: { userId: "otherUser", restaurantId: "r1" }, user: { id: "u1" } };
+    const res = mockRes();
+
+    await savedRestaurantController.unsaveRestaurant(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(deleteSpy).not.toHaveBeenCalled();
   });
 });
