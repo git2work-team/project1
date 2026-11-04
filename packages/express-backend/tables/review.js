@@ -27,6 +27,19 @@ const ReviewSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    votes: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        vote: {
+          type: Number,
+          enum: [-1, 1],
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );
