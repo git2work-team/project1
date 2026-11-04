@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
-import { getReviewsByRestaurant } from "./api.js";
-
+import { getReviewsByRestaurant, voteReview } from "./api.js";
+import { getCurrentUser } from "./auth.js";
 function Stars(props) {
   return (
     <span>
@@ -113,7 +113,8 @@ function summarizeReviews(reviews) {
 
 function RestaurantPage(props) {
   const [reviews, setReviews] = useState([]);
-
+  const [voting, setVoting] = useState(false);
+  const [voteError, setVoteError] = useState("");
   useEffect(() => {
     if (!props.selectedRestaurant._id) {
       return;
@@ -132,6 +133,39 @@ function RestaurantPage(props) {
   };
   const mapQuery = encodeURIComponent(restaurantToOpen.address);
   const ratingPercentages = calculateRatingPercentages(restaurantToOpen);
+
+  async function handleVote(reviewId, vote) {
+    const user = getCurrentUser();
+    if (!user) {
+      setVoteError("Please sign in to vote");
+      return;
+    }
+    //if user signed in, let them vote
+    setVoting(true);
+    setVoteError("");
+
+    try {
+      const result = await voteReview(reviewId, user._id, vote);
+      setReviews((currentReviews) => {
+        const updatedReviews = [];
+        for (const review of currentReviews) {
+          if (review._id === reviewId) {
+            const updatedReview = { ...review };
+            updatedReview.votes = result.votes;
+            updatedReviews.push(updatedReview);
+          } else {
+            updatedReviews.push(review)
+          }
+        }
+        return updatedReviews;
+      });
+    } catch (error) {
+      setVoteError(error.message);
+    } finally {
+      setVoting(false);
+    }
+  }
+
   return (
     <main id="overview" className="restaurantPage">
       <div className="restaurantHeader">
@@ -251,30 +285,51 @@ function RestaurantPage(props) {
           </div>
         </div>
         {reviews.length === 0 && <p>No reviews yet.</p>}
-        {reviews.map((review) => (
-          <div key={review._id} className="reviewItem">
-            <p className="reviewUser">{review.userId?.fullName}</p>
-            <div className="reviewRatingDate">
-              <Stars rating={review.rating} size="26px" />
-              <span className="reviewDate">
-                {new Date(review.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
+        {reviews.map((review) => {
+          const votes = review.votes || [];
+          let likeCount = 0;
+          let dislikeCount = 0;
+          for (const entry of votes) {
+            if (entry.vote === 1) {
+              likeCount += 1;
+            } else if (entry.vote === -1) {
+              dislikeCount += 1;
+            }
+          }
+
+          return (
+            <div key={review._id} className="reviewItem">
+              <p className="reviewUser">{review.userId?.fullName}</p>
+              <div className="reviewRatingDate">
+                <Stars rating={review.rating} size="26px" />
+                <span className="reviewDate">
+                  {new Date(review.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+              <p className="reviewText">{review.description}</p>
+              <div className="reviewVotes">
+                <button type="button" disabled={voting} onClick={() => handleVote(review._id, 1)}>
+                  Like ({likeCount})
+                </button>
+                <button type="button" disabled={voting} onClick={() => handleVote(review._id, -1)}>
+                  Dislike ({dislikeCount})
+                </button>
+              </div>
+              {review.photos?.map((photo) => (
+                <img
+                  key={photo._id}
+                  className="reviewPhoto"
+                  src={photo.imageUrl}
+                  alt="Photo attached to this review"
+                ></img>
+              ))}
             </div>
-            <p className="reviewText">{review.description}</p>
-            {review.photos?.map((photo) => (
-              <img
-                key={photo._id}
-                className="reviewPhoto"
-                src={photo.imageUrl}
-                alt="Photo attached to this review"
-              ></img>
-            ))}
-          </div>
-        ))}
+          );
+        })}
       </section>
     </main>
   );
