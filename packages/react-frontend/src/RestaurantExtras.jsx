@@ -38,26 +38,6 @@ const mockMenus = {
   ],
 };
 
-// Big photo on the left, two smaller ones on the right (same layout as the Figma page)
-export function RestaurantPhotos() {
-  return (
-    <div className="rx-photos">
-      <div className="rx-photo rx-photo-main">
-        <span>IMAGE</span>
-        <button className="rx-btn rx-see-all">See all photos</button>
-      </div>
-      <div className="rx-photo-side">
-        <div className="rx-photo">
-          <span>Food</span>
-        </div>
-        <div className="rx-photo">
-          <span>Interior</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Write a review / Add photos / Save buttons
 export function RestaurantActions(props) {
   const [saved, setSaved] = useState(false);
@@ -132,5 +112,92 @@ export function RestaurantMenu(props) {
         </div>
       ))}
     </section>
+  );
+}
+//create a restaurant gallery
+export function RestaurantPhotos(props) {
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photos = props.photos || [];
+  const mainPhoto = photos[0];
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  function nextPhoto() {
+    setPhotoIndex((current) => (current + 1) % photos.length);
+  }
+  function prevPhoto() {
+    setPhotoIndex((current) => (current - 1 + photos.length) % photos.length);
+  }
+
+  return (
+    <div>
+      <div className="rx-photos">
+        <div className="rx-photo rx-photo-main">
+          {mainPhoto ? (
+            <div>
+              <button
+                type="button"
+                className="rx-photo-preview"
+                onClick={() => setGalleryOpen(true)}
+                aria-label="Open restaurant photo gallery"
+              >
+                <div
+                  className="rx-photo-track"
+                  style={{ transform: `translateX(-${photoIndex * 100}%)` }}
+                >
+                  {photos.map((photo, index) => (
+                    <img
+                      key={photo._id}
+                      src={photo.imageUrl}
+                      alt={`Restaurant review photo ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </button>
+              {photos.length > 1 && (
+                <div>
+                  <button
+                    type="button"
+                    className="rx-preview-arrow rx-preview-prev"
+                    onClick={prevPhoto}
+                    aria-label="Previous photo"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    className="rx-preview-arrow rx-preview-next"
+                    onClick={nextPhoto}
+                    aria-label="Next photo"
+                  >
+                    →
+                  </button>
+                </div>
+              )}
+              <button
+                type="button"
+                className="rx-btn rx-see-all"
+                onClick={() => setGalleryOpen(true)}
+              >
+                See all photos ({photos.length})
+              </button>
+            </div>
+          ) : (
+            <span>No photos yet</span>
+          )}
+        </div>
+      </div>
+      {/*shows gallery of photos when galleryOpen is true*/}
+      {galleryOpen && (
+        <div className="rx-gallery" aria-label="Restaurant photos">
+          <button type="button" className="rx-btn" onClick={() => setGalleryOpen(false)}>
+            Close gallery
+          </button>
+          <div className="rx-gallery-grid">
+            {photos.map((photo) => (
+              <img key={photo._id} src={photo.imageUrl} alt="Restaurant review photo" />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

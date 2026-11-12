@@ -165,6 +165,12 @@ function RestaurantPage(props) {
       setVoting(false);
     }
   }
+  const restaurantPhotos = [];
+  for (const review of reviews) {
+    for (const photo of review.photos || []) {
+      restaurantPhotos.push(photo);
+    }
+  }
 
   return (
     <main id="overview" className="restaurantPage">
@@ -190,7 +196,7 @@ function RestaurantPage(props) {
           ))}
         </div>
       </div>
-      <RestaurantPhotos />
+      <RestaurantPhotos photos={restaurantPhotos}/>
       <RestaurantActions
         restaurantId={props.selectedRestaurant._id}
         onReview={() => props.onReview(props.selectedRestaurant)}
