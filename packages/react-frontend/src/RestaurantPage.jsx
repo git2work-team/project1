@@ -3,6 +3,7 @@ import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
 import { getReviewsByRestaurant, voteReview } from "./api.js";
 import { getCurrentUser } from "./auth.js";
+import { deleteReview } from "./api.js";
 function Stars(props) {
   return (
     <span>
@@ -154,7 +155,7 @@ function RestaurantPage(props) {
             updatedReview.votes = result.votes;
             updatedReviews.push(updatedReview);
           } else {
-            updatedReviews.push(review)
+            updatedReviews.push(review);
           }
         }
         return updatedReviews;
@@ -163,6 +164,27 @@ function RestaurantPage(props) {
       setVoteError(error.message);
     } finally {
       setVoting(false);
+    }
+  }
+  const restaurantPhotos = [];
+  for (const review of reviews) {
+    for (const photo of review.photos || []) {
+      restaurantPhotos.push(photo);
+    }
+  }
+
+  async function handleDeleteReview(reviewId) {
+    const confirmed = window.confirm("Delete this review?");
+    if (confirmed === false) {
+      return;
+    }
+    try {
+      await deleteReview(reviewId);
+      setReviews((currentReviews) => {
+        return currentReviews.filter((review) => review._id !== reviewId);
+      });
+    } catch (error) {
+      console.log("Could not delete review:", error.message);
     }
   }
 
@@ -190,7 +212,7 @@ function RestaurantPage(props) {
           ))}
         </div>
       </div>
-      <RestaurantPhotos />
+      <RestaurantPhotos photos={restaurantPhotos} />
       <RestaurantActions
         restaurantId={props.selectedRestaurant._id}
         onReview={() => props.onReview(props.selectedRestaurant)}
@@ -286,6 +308,16 @@ function RestaurantPage(props) {
         </div>
         {reviews.length === 0 && <p>No reviews yet.</p>}
         {reviews.map((review) => {
+          let deleteButton = null;
+          if (getCurrentUser() && review.userId) {
+            if (review.userId._id === getCurrentUser()._id) {
+              deleteButton = (
+                <button type="button" onClick={() => handleDeleteReview(review._id)}>
+                  Delete review
+                </button>
+              );
+            }
+          }
           const votes = review.votes || [];
           let likeCount = 0;
           let dislikeCount = 0;
@@ -311,6 +343,7 @@ function RestaurantPage(props) {
                 </span>
               </div>
               <p className="reviewText">{review.description}</p>
+              {deleteButton}
               <div className="reviewVotes">
                 <button type="button" disabled={voting} onClick={() => handleVote(review._id, 1)}>
                   Like ({likeCount})
