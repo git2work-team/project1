@@ -56,6 +56,7 @@ function Signup() {
         <input
           type="text"
           id="fullName"
+          maxLength={100}
           name="fullName"
           placeholder="Your Name"
           value={form.fullName}
@@ -66,6 +67,7 @@ function Signup() {
         <input
           type="email"
           id="email"
+          maxLength={254}
           name="email"
           placeholder="yourname@calpoly.edu"
           value={form.email}
@@ -76,6 +78,7 @@ function Signup() {
         <input
           type="password"
           id="password"
+          maxLength={72}
           name="password"
           placeholder="Example"
           value={form.password}
@@ -86,6 +89,7 @@ function Signup() {
         <input
           type="password"
           id="passwordAgain"
+          maxLength={72}
           name="passwordAgain"
           placeholder="Example"
           value={form.passwordAgain}

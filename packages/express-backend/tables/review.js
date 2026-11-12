@@ -26,6 +26,7 @@ const ReviewSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: [2000, "Review is too long"],
     },
   },
   { timestamps: { createdAt: true, updatedAt: false } }

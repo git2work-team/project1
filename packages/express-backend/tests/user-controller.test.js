@@ -23,6 +23,18 @@ describe("createUser", () => {
     expect(createSpy).not.toHaveBeenCalled();
   });
 
+  test("rejects passwords longer than 72 characters", async () => {
+    const createSpy = jest.spyOn(User, "create");
+    const req = { body: { fullName: "A", email: "a@b.com", password: "a".repeat(73) } };
+    const res = mockRes();
+
+    await userController.createUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Password must be at most 72 characters" });
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
   test("rejects a missing password", async () => {
     const createSpy = jest.spyOn(User, "create");
     const req = { body: { fullName: "A", email: "a@b.com" } };

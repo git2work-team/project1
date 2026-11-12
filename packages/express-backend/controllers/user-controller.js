@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
+// bcrypt ignores everything after 72 bytes, so longer passwords are not useful
+const MAX_PASSWORD_LENGTH = 72;
 
 function createToken(user) {
   return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -18,6 +20,11 @@ async function createUser(req, res) {
     return res
       .status(400)
       .json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return res
+      .status(400)
+      .json({ error: `Password must be at most ${MAX_PASSWORD_LENGTH} characters` });
   }
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 

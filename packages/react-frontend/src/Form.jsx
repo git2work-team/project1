@@ -49,6 +49,7 @@ function Form(props) {
       <textarea
         name="description"
         id="description"
+        maxLength={2000}
         rows="10"
         value={description}
         onChange={(event) => setDescription(event.target.value)}

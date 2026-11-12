@@ -42,6 +42,7 @@ function Login() {
         <input
           type="email"
           id="email"
+          maxLength={254}
           name="email"
           placeholder="yourname@calpoly.edu"
           value={form.email}
@@ -52,6 +53,7 @@ function Login() {
         <input
           type="password"
           id="password"
+          maxLength={72}
           name="password"
           placeholder="Example"
           value={form.password}
