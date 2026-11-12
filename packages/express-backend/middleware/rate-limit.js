@@ -3,9 +3,11 @@ import rateLimit from "express-rate-limit";
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
 // strict limit for login and signup so passwords can't be guessed quickly
+// only failed requests (status 400 and up) count, so normal logins never get blocked
 export const authLimiter = rateLimit({
   windowMs: FIFTEEN_MINUTES,
   limit: 10,
+  skipSuccessfulRequests: true,
   message: { error: "Too many attempts, try again later" },
 });
 

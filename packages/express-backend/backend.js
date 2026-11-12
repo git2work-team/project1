@@ -13,6 +13,8 @@ import savedRestaurantRoutes from "./routes/saved-restaurant-routes.js";
 import { generalLimiter } from "./middleware/rate-limit.js";
 
 const app = express();
+// on Render there is one proxy in front of the server, set TRUST_PROXY=1 there
+if (process.env.TRUST_PROXY) app.set("trust proxy", Number(process.env.TRUST_PROXY));
 const port = process.env.PORT || 8000;
 
 app.use(helmet());
