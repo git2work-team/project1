@@ -8,12 +8,14 @@ import userRoutes from "./routes/user-routes.js";
 import reviewRoutes from "./routes/review-routes.js";
 import reviewPhotoRoutes from "./routes/review-photo-routes.js";
 import savedRestaurantRoutes from "./routes/saved-restaurant-routes.js";
+import { generalLimiter } from "./middleware/rate-limit.js";
 
 const app = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
+app.use(generalLimiter);
 
 app.use("/restaurants", restaurantRoutes);
 app.use(menuItemRoutes);
