@@ -3,6 +3,7 @@ import "./RestaurantPage.css";
 import { RestaurantPhotos, RestaurantActions, RestaurantMenu } from "./RestaurantExtras.jsx";
 import { getReviewsByRestaurant, voteReview } from "./api.js";
 import { getCurrentUser } from "./auth.js";
+import OpenNowBadge from "./OpenNowBadge";
 import { deleteReview } from "./api.js";
 function Stars(props) {
   return (
@@ -194,6 +195,7 @@ function RestaurantPage(props) {
         <p>{restaurantToOpen.address}</p>
 
         <h1>{restaurantToOpen.name}</h1>
+        <OpenNowBadge openingHours={restaurantToOpen.openingHours} />
       </div>
       <div className="restaurantFeatures">
         <div className="ratingAndPrice">
