@@ -34,6 +34,12 @@ const RestaurantSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Google's weekly opening periods, used for the "Open now" badge
+    // e.g. [{ open: { day: 1, hour: 9, minute: 0 }, close: { day: 1, hour: 17, minute: 0 } }]
+    openingHours: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: undefined,
+    },
     // The Google API
     googlePlaceId: {
       type: String,

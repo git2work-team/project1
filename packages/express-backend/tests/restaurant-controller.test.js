@@ -40,7 +40,7 @@ describe("getRestaurants", () => {
 
     const pipeline = Restaurant.aggregate.mock.calls[0][0];
     expect(pipeline[0]).toEqual({ $match: {} });
-    expect(pipeline[pipeline.length - 1]).toEqual({ $sort: { name: 1 } });
+    expect(pipeline[pipeline.length - 1]).toEqual({ $sort: { isPrefixMatch: 1, name: 1 } });
     expect(res.json).toHaveBeenCalledWith(restaurants);
   });
 
@@ -132,4 +132,68 @@ describe("deleteRestaurant", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "Restaurant not found" });
   });
+
+
+});
+
+describe("getRestaurants - Search and Filters", () => {
+  test("returns restaurants filtered by multiple comma-separated cuisines", async () => {
+    const restaurants = [
+      { name: "Pizza Place", cuisine: "Pizza" },
+      { name: "Taco Spot", cuisine: "Mexican" },
+    ];
+    jest.spyOn(Restaurant, "aggregate").mockResolvedValue(restaurants);
+    const res = mockRes();
+
+    const req = { query: { cuisine: "Pizza,Mexican" } };
+    await restaurantController.getRestaurants(req, res);
+
+    const pipeline = Restaurant.aggregate.mock.calls[0][0];
+    const matchStage = pipeline[0].$match;
+
+    expect(matchStage.cuisine).toBeDefined();
+    expect(matchStage.cuisine.$in).toBeDefined();
+    expect(res.json).toHaveBeenCalledWith(restaurants);
+  });
+
+  test("combines search query and cuisine filters correctly", async () => {
+    jest.spyOn(Restaurant, "aggregate").mockResolvedValue([]);
+    const res = mockRes();
+
+    const req = { query: { search: "downtown", cuisine: "Italian" } };
+    await restaurantController.getRestaurants(req, res);
+
+    const pipeline = Restaurant.aggregate.mock.calls[0][0];
+    const matchStage = pipeline[0].$match;
+
+    expect(matchStage).toBeDefined();
+    expect(res.json).toHaveBeenCalledWith([]);
+  });
+});
+
+  describe("getCuisines", () => {
+  test("returns sorted unique cuisines ignoring null or empty values", async () => {
+    const mockDistinctCuisines = ["Mexican", "Smoothies", "Italian", "", null];
+    jest.spyOn(Restaurant, "distinct").mockResolvedValue(mockDistinctCuisines);
+    const res = mockRes();
+
+    await restaurantController.getCuisines({}, res);
+
+    expect(Restaurant.distinct).toHaveBeenCalledWith("cuisine", {
+      cuisine: { $ne: null, $ne: "" },
+    });
+    
+    expect(res.json).toHaveBeenCalled();
+  });
+
+  test("handles errors gracefully and returns 500", async () => {
+    jest.spyOn(Restaurant, "distinct").mockRejectedValue(new Error("Database error"));
+    const res = mockRes();
+
+    await restaurantController.getCuisines({}, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Database error" });
+  });
+
 });

@@ -9,5 +9,6 @@ router.get("/:id", reviewController.getReviewById);
 router.post("/", requireAuth, reviewController.createReview);
 router.patch("/:id", requireAuth, reviewController.updateReview);
 router.delete("/:id", requireAuth, reviewController.deleteReview);
+router.put("/:id/vote", reviewController.voteReview);
 
 export default router;

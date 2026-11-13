@@ -1,5 +1,6 @@
 import React from "react";
 import "./RestaurantCard.css";
+import OpenNowBadge from "./OpenNowBadge";
 
 
 function Stars(props) {
@@ -42,7 +43,8 @@ function RestaurantCard({ restaurant, onClick }) {
     description,
     address,
     rating = 4.5,
-    cuisineLabel,
+    cuisine,
+    openingHours,
   } = restaurant;
 
   return (
@@ -69,8 +71,8 @@ function RestaurantCard({ restaurant, onClick }) {
       <div className="card-info">
         <div className="card-header">
           <h3 className="restaurant-name">{name}</h3>
-          {cuisineLabel && (
-            <span className="cuisine-badge">{cuisineLabel}</span>
+          {cuisine && (
+            <span className="cuisine-badge">{cuisine}</span>
           )}
         </div>
 
@@ -80,6 +82,7 @@ function RestaurantCard({ restaurant, onClick }) {
           <span className="rating-score" style={{ marginLeft: "6px" }}>
             {rating.toFixed(1)}
           </span>
+          <OpenNowBadge openingHours={openingHours} />
         </div>
 
         <p className="restaurant-description">

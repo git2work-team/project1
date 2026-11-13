@@ -28,6 +28,19 @@ const ReviewSchema = new mongoose.Schema(
       trim: true,
       maxlength: [2000, "Review is too long"],
     },
+    votes: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        vote: {
+          type: Number,
+          enum: [-1, 1],
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

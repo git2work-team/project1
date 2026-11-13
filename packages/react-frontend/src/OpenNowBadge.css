@@ -1,0 +1,18 @@
+/* Solid colors so the badge is readable on the white card and the dark restaurant page */
+.openNowBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+.openNowBadge.open {
+  background-color: #236c34;
+}
+
+.openNowBadge.closed {
+  background-color: #6b7280;
+}

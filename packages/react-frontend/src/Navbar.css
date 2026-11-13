@@ -53,4 +53,50 @@ body {
 .navbar a.active {
 	background-color: blue;
 }
+/* Make the Profile item the positioning anchor. */
+.navbar .profile-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 
+/* Place the options below the anchor without resizing the navbar. */
+.navbar .profile-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+
+  background-color: white;
+  color: #222;
+  min-width: 180px;
+  padding: 0.5rem;
+}
+/* Circle around the profile icon. */
+.navbar .profile-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 0.75rem;
+  padding: 0;
+  border: 1px solid white;
+  border-radius: 50%;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+/* Keep the icon smaller than the surrounding circle. */
+.navbar .profile-trigger svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* Keep the Profile container from inheriting the general li hover colors. */
+.navbar .profile-dropdown:hover {
+  background-color: transparent;
+  color: white;
+}

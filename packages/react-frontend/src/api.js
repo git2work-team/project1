@@ -2,6 +2,7 @@
 import { API_URL } from "./config";
 import { getToken, logOut } from "./auth";
 
+
 // Sends a request and returns the JSON. Throws the backend's error message if it fails.
 async function request(path, options = {}) {
   const token = getToken();
@@ -20,6 +21,11 @@ async function request(path, options = {}) {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    // The saved user was deleted, so their old id is useless. Log out and send them to log in again.
+    if (res.status === 404 && body.error === "User not found") {
+      logOut();
+      window.location.href = "/Login";
+    }
     throw new Error(body.error || `Request failed with status ${res.status}`);
   }
 
@@ -54,7 +60,11 @@ export function getRestaurants(filters = {}) {
     queryParams.append("search", filters.search);
   }
   if (filters.cuisine) {
-    queryParams.append("cuisine", filters.cuisine);
+    if (Array.isArray(filters.cuisine) && filters.cuisine.length > 0) {
+      queryParams.append("cuisine", filters.cuisine.join(","));
+    } else if (typeof filters.cuisine === "string" && filters.cuisine.trim() !== "") {
+      queryParams.append("cuisine", filters.cuisine);
+    }
   }
 
   const queryString = queryParams.toString();
@@ -62,6 +72,11 @@ export function getRestaurants(filters = {}) {
 
   return request(path);
 }
+
+export function getCuisines() {
+  return request("/restaurants/cuisines");
+}
+
 
 // ---------- Reviews (review-routes.js) ----------
 
@@ -127,5 +142,12 @@ export async function uploadReviewPhoto(reviewId, file) {
     body: JSON.stringify({
       imageUrl: result.secure_url,
     }),
+  });
+}
+
+export function voteReview(reviewId, userId, vote) {
+  return request(`/reviews/${reviewId}/vote`, {
+    method: "PUT",
+    body: JSON.stringify({ userId, vote }),
   });
 }
