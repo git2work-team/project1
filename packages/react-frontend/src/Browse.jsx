@@ -1,30 +1,52 @@
 import React, { useState, useEffect } from "react";
-import { getRestaurants } from "./api.js";
+import { getRestaurants, getCuisines } from "./api.js";
 import RestaurantCard from "./RestaurantCard";
 
 function Browse(props) {
   const [searchTerm, setSearchTerm] = useState(props.initialSearch || "");
-  const [selectedCuisine, setSelectedCuisine] = useState("");
+  const [selectedCuisines, setSelectedCuisines] = useState([]); 
   const [restaurants, setRestaurants] = useState([]);
-  const [sortBy, setSortBy] = useState([]);
+  const [sortBy, setSortBy] = useState("");
+  const [cuisinesList, setCuisinesList] = useState([]);
+
+  useEffect(() => {
+    getCuisines()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCuisinesList(data);
+        }
+      })
+      .catch((err) => console.log("Failed to load cuisines: ", err.message));
+  }, []);
 
   useEffect(() => {
     const filters = {
       search: searchTerm,
-      cuisine: selectedCuisine,
+      cuisine: selectedCuisines,
     };
 
     getRestaurants(filters)
-      .then((data) => setRestaurants(data))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setRestaurants(data);
+        }
+      })
       .catch((error) => console.log(error.message));
-  }, [searchTerm, selectedCuisine]);
+  }, [searchTerm, selectedCuisines]);
 
+  const handleCuisineToggle = (cuisine) => {
+    if (selectedCuisines.includes(cuisine)) {
+      setSelectedCuisines(selectedCuisines.filter((c) => c !== cuisine));
+    } else {
+      setSelectedCuisines([...selectedCuisines, cuisine]);
+    }
+  };
 
   const handleClearFilters = () => {
     setSearchTerm("");
-    setSelectedCuisine("");
+    setSelectedCuisines([]);
     setSortBy("");
-  }
+  };
 
   const sortedRestaurants = [...restaurants].sort((a, b) => {
     if (sortBy === "highestRated") {
@@ -37,11 +59,11 @@ function Browse(props) {
       return (a.name || "").localeCompare(b.name || "");
     }
     return 0;
-  })
+  });
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "20px", color: "#00000" }}>Browse Restaurants</h1>
+      <h1 style={{ marginBottom: "20px", color: "#000000" }}>Browse Restaurants</h1>
       
       <div 
         style={{ 
@@ -51,7 +73,6 @@ function Browse(props) {
           marginBottom: "24px" 
         }}
       >
-        
         <input
           type="text"
           placeholder="Search by name, address, description..."
@@ -65,23 +86,36 @@ function Browse(props) {
           }}
         />
 
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          
-          <select
-            value={selectedCuisine}
-            onChange={(e) => setSelectedCuisine(e.target.value)}
-            style={{ 
-              flex: "1", 
-              minWidth: "150px",
-              padding: "10px 14px", 
-              borderRadius: "8px", 
-              border: "1px solid #ccc" 
-            }}
-          >
-            <option value="">All Cuisines</option>
-            <option value="Test">Test</option>
-          </select>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ fontWeight: "600", fontSize: "14px", marginRight: "4px" }}>Cuisines:</span>
+          {Array.isArray(cuisinesList) &&
+            cuisinesList
+              .filter((cuisine) => typeof cuisine === "string" && cuisine.trim() !== "")
+              .map((cuisine) => {
+                const isSelected = selectedCuisines.includes(cuisine);
+                return (
+                  <button
+                    key={cuisine}
+                    onClick={() => handleCuisineToggle(cuisine)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      border: "1px solid #ccc",
+                      background: isSelected ? "#287632" : "#f5f5f5",
+                      color: isSelected ? "#fff" : "#333",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                      fontWeight: isSelected ? "600" : "400",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {cuisine} {isSelected}
+                  </button>
+                );
+              })}
+        </div>
 
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -105,7 +139,8 @@ function Browse(props) {
               padding: "10px 16px", 
               borderRadius: "8px", 
               border: "1px solid #ccc",
-              background: "#287632",
+              background: "#e0e0e0",
+              color: "#333",
               cursor: "pointer",
               fontWeight: "500"
             }}
@@ -115,7 +150,6 @@ function Browse(props) {
         </div>
       </div>
 
-
       <div 
         style={{ 
           display: "grid", 
@@ -123,7 +157,7 @@ function Browse(props) {
           gap: "20px" 
         }}
       >
-        {restaurants.map((restaurant) => (
+        {sortedRestaurants.map((restaurant) => (
           <RestaurantCard
             key={restaurant._id}
             restaurant={restaurant}

@@ -6,23 +6,32 @@ async function createRestaurant(req, res) {
 }
 
 async function getRestaurants(req, res) {
-  //will also calculate the total rating here
   try {
     const { search, cuisine } = req.query;
     const matchFilter = {};
 
     if (search) {
-      const searchRegex = new RegExp(search, "i"); 
+      const searchRegex = new RegExp(search, "i");
       matchFilter.$or = [
         { name: searchRegex },
         { address: searchRegex },
         { description: searchRegex },
-        { cuisineLabel: searchRegex },
+        { cuisine: searchRegex },
       ];
     }
 
     if (cuisine) {
-      matchFilter.cuisine = { $regex: new RegExp(cuisine, "i") };
+      const cuisineArray = typeof cuisine === "string" ? cuisine.split(",").map(c => c.trim()) : cuisine;   
+      const cuisineRegexes = cuisineArray.map(c => new RegExp("^" + c + "$", "i"));
+      if (matchFilter.$or) {
+        matchFilter.$and = [
+          { $or: matchFilter.$or },
+          { cuisine: { $in: cuisineRegexes } }
+        ];
+        delete matchFilter.$or;
+      } else {
+        matchFilter.cuisine = { $in: cuisineRegexes };
+      }
     }
 
     const restaurants = await Restaurant.aggregate([
@@ -45,17 +54,42 @@ async function getRestaurants(req, res) {
               else: { $avg: "$reviewsList.rating" },
             },
           },
+          isPrefixMatch: search
+            ? {
+                $cond: {
+                  if: {
+                    $regexMatch: {
+                      input: "$name",
+                      regex: new RegExp("^" + search, "i"), 
+                    },
+                  },
+                  then: 0, 
+                  else: 1,
+                },
+              }
+            : 0,
         },
       },
-      {
-        $project: {
-          reviewsList: 0,
-        },
-      },
-      { $sort: { name: 1 } },
+      { $project: { reviewsList: 0 } },
+      { $sort: { isPrefixMatch: 1, name: 1 } },
     ]);
 
     res.json(restaurants);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function getCuisines(req, res) {
+  try {
+    const cuisines = await Restaurant.distinct("cuisine", { 
+      cuisine: { $ne: null, $ne: "" } 
+    });
+
+    const validCuisines = cuisines
+      .filter((c) => typeof c === "string" && c.trim() !== "");
+
+    res.json(validCuisines.sort());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -96,4 +130,5 @@ export default {
   getRestaurantById,
   updateRestaurant,
   deleteRestaurant,
+  getCuisines,
 };
