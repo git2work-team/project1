@@ -6,10 +6,18 @@ import Review from "./Review";
 
 import "./Navbar.css";
 import { getCurrentUser, logOut } from "./auth";
+import { getUserById } from "./api";
 
 function Navbar() {
   const user = getCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Check the saved user still exists. If they were deleted, api.js logs them out.
+  useEffect(() => {
+    if (user) {
+      getUserById(user._id).catch((error) => console.log(error.message));
+    }
+  }, []);
 
   function handleLogOut(event) {
     event.preventDefault();
