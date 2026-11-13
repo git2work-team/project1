@@ -1,5 +1,6 @@
 // One function per backend route. Names match the controller functions in express-backend.
 import { API_URL } from "./config";
+import { logOut } from "./auth";
 
 // Sends a request and returns the JSON. Throws the backend's error message if it fails.
 async function request(path, options = {}) {
@@ -10,6 +11,11 @@ async function request(path, options = {}) {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    // The saved user was deleted, so their old id is useless. Log out and send them to log in again.
+    if (res.status === 404 && body.error === "User not found") {
+      logOut();
+      window.location.href = "/Login";
+    }
     throw new Error(body.error || `Request failed with status ${res.status}`);
   }
 
