@@ -40,7 +40,7 @@ describe("getRestaurants", () => {
 
     const pipeline = Restaurant.aggregate.mock.calls[0][0];
     expect(pipeline[0]).toEqual({ $match: {} });
-    expect(pipeline[pipeline.length - 1]).toEqual({ $sort: { name: 1 } });
+    expect(pipeline[pipeline.length - 1]).toEqual({ $sort: { isPrefixMatch: 1, name: 1 } });
     expect(res.json).toHaveBeenCalledWith(restaurants);
   });
 
