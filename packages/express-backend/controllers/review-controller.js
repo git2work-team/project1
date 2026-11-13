@@ -47,7 +47,8 @@ async function getReviewById(req, res) {
 }
 
 async function createReview(req, res) {
-  const { userId, restaurantId, rating, description } = req.body;
+  const { restaurantId, rating, description } = req.body;
+  const userId = req.user.id;
 
   const userExists = await User.exists({ _id: userId });
   if (!userExists) {
@@ -82,25 +83,32 @@ async function createReview(req, res) {
 }
 
 async function updateReview(req, res) {
-  delete req.body.userId;
-  delete req.body.restaurantId;
-
-  const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const review = await Review.findById(req.params.id);
   if (!review) {
     return res.status(404).json({ error: "Review not found" });
   }
+  if (!review.userId.equals(req.user.id)) {
+    return res.status(403).json({ error: "You can only edit your own reviews" });
+  }
+
+  const { rating, description } = req.body;
+  if (rating !== undefined) review.rating = rating;
+  if (description !== undefined) review.description = description;
+
+  await review.save();
   res.json(review);
 }
 
 async function deleteReview(req, res) {
-  const review = await Review.findByIdAndDelete(req.params.id);
+  const review = await Review.findById(req.params.id);
   if (!review) {
     return res.status(404).json({ error: "Review not found" });
   }
+  if (!review.userId.equals(req.user.id)) {
+    return res.status(403).json({ error: "You can only delete your own reviews" });
+  }
 
+  await review.deleteOne();
   await ReviewPhoto.deleteMany({ reviewId: review._id });
   res.status(204).end();
 }

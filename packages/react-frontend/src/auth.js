@@ -1,11 +1,13 @@
 // Remembers who is logged in, in the browser's localStorage, so it stays after a refresh.
 // Only the id, name, and email are kept, never the password.
+const TOKEN_KEY = "sloFoodsToken";
 const KEY = "sloFoodsUser";
 
-export function saveCurrentUser(user) {
+export function saveCurrentUser({ token, user }) {
   const info = { _id: user._id, fullName: user.fullName, email: user.email };
   try {
     localStorage.setItem(KEY, JSON.stringify(info));
+    localStorage.setItem(TOKEN_KEY, token);
   } catch (error) {
     console.log("Could not save login:", error);
   }
@@ -20,9 +22,18 @@ export function getCurrentUser() {
   }
 }
 
+export function getToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export function logOut() {
   try {
     localStorage.removeItem(KEY);
+    localStorage.removeItem(TOKEN_KEY);
   } catch (error) {
     console.log("Could not log out:", error);
   }

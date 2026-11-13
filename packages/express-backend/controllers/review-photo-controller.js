@@ -15,10 +15,13 @@ async function getPhotosByReview(req, res) {
 
 async function createReviewPhoto(req, res) {
   const { reviewId } = req.params;
+  const review = await Review.findById(reviewId);
 
-  const reviewExists = await Review.exists({ _id: reviewId });
-  if (!reviewExists) {
+  if (!review) {
     return res.status(404).json({ error: "Review not found" });
+  }
+  if (!review.userId.equals(req.user.id)) {
+    return res.status(403).json({ error: "You can only add photos to your own reviews" });
   }
 
   const photo = await ReviewPhoto.create({ imageUrl: req.body.imageUrl, reviewId });
@@ -26,10 +29,15 @@ async function createReviewPhoto(req, res) {
 }
 
 async function deleteReviewPhoto(req, res) {
-  const photo = await ReviewPhoto.findByIdAndDelete(req.params.id);
+  const photo = await ReviewPhoto.findById(req.params.id);
   if (!photo) {
     return res.status(404).json({ error: "Photo not found" });
   }
+  const review = await Review.findById(photo.reviewId);
+  if (!review || !review.userId.equals(req.user.id)) {
+    return res.status(403).json({ error: "You can only delete your own photos" });
+  }
+  await photo.deleteOne();
   res.status(204).end();
 }
 

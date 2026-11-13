@@ -4,6 +4,9 @@ import User from "../tables/user.js";
 
 async function getSavedRestaurants(req, res) {
   const { userId } = req.params;
+  if (userId !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own saved restaurants" });
+  }
 
   const userExists = await User.exists({ _id: userId });
   if (!userExists) {
@@ -18,6 +21,9 @@ async function getSavedRestaurants(req, res) {
 
 async function saveRestaurant(req, res) {
   const { userId } = req.params;
+  if (userId !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own saved restaurants" });
+  }
   const { restaurantId } = req.body;
 
   const userExists = await User.exists({ _id: userId });
@@ -36,6 +42,9 @@ async function saveRestaurant(req, res) {
 
 async function unsaveRestaurant(req, res) {
   const { userId, restaurantId } = req.params;
+  if (userId !== req.user.id) {
+    return res.status(403).json({ error: "You can only access your own saved restaurants" });
+  }
 
   const savedRestaurant = await SavedRestaurant.findOneAndDelete({ userId, restaurantId });
   if (!savedRestaurant) {

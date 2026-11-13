@@ -4,6 +4,8 @@ import User from "../tables/user.js";
 import userController from "../controllers/user-controller.js";
 import { mockRes } from "./helper/mock-res.js";
 
+process.env.JWT_SECRET = "test-secret";
+
 afterEach(() => {
   jest.restoreAllMocks();
 });
@@ -18,6 +20,18 @@ describe("createUser", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "Password must be at least 8 characters" });
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  test("rejects passwords longer than 72 characters", async () => {
+    const createSpy = jest.spyOn(User, "create");
+    const req = { body: { fullName: "A", email: "a@b.com", password: "a".repeat(73) } };
+    const res = mockRes();
+
+    await userController.createUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Password must be at most 72 characters" });
     expect(createSpy).not.toHaveBeenCalled();
   });
 
@@ -47,7 +61,10 @@ describe("createUser", () => {
       passwordHash: "hashed!",
     });
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ _id: "1", fullName: "A" });
+    expect(res.json).toHaveBeenCalledWith({
+      token: expect.any(String),
+      user: { _id: "1", fullName: "A" },
+    });
   });
 
   test("returns 409 when the email is already used", async () => {
@@ -96,7 +113,7 @@ describe("loginUser", () => {
     expect(select).toHaveBeenCalledWith("+passwordHash");
     expect(bcrypt.compare).toHaveBeenCalledWith("longenough", "hashed!");
     expect(res.status).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith(user);
+    expect(res.json).toHaveBeenCalledWith({ token: expect.any(String), user });
   });
 
   test("returns 401 when the password is wrong", async () => {
@@ -142,7 +159,7 @@ describe("getUserById", () => {
     jest.spyOn(User, "findById").mockResolvedValue(user);
     const res = mockRes();
 
-    await userController.getUserById({ params: { id: "1" } }, res);
+    await userController.getUserById({ params: { id: "1" }, user: { id: "1" } }, res);
 
     expect(User.findById).toHaveBeenCalledWith("1");
     expect(res.json).toHaveBeenCalledWith(user);
@@ -152,10 +169,20 @@ describe("getUserById", () => {
     jest.spyOn(User, "findById").mockResolvedValue(null);
     const res = mockRes();
 
-    await userController.getUserById({ params: { id: "1" } }, res);
+    await userController.getUserById({ params: { id: "1" }, user: { id: "1" } }, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "User not found" });
+  });
+
+  test("returns 403 when looking up another user", async () => {
+    const findSpy = jest.spyOn(User, "findById");
+    const res = mockRes();
+
+    await userController.getUserById({ params: { id: "2" }, user: { id: "1" } }, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(findSpy).not.toHaveBeenCalled();
   });
 });
 
@@ -164,6 +191,7 @@ describe("updateUser", () => {
     jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue({ _id: "1", fullName: "B" });
     const req = {
       params: { id: "1" },
+      user: { id: "1" },
       body: { fullName: "B", email: "b@b.com", passwordHash: "sneaky" },
     };
     const res = mockRes();
@@ -182,9 +210,22 @@ describe("updateUser", () => {
     jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue(null);
     const res = mockRes();
 
-    await userController.updateUser({ params: { id: "1" }, body: {} }, res);
+    await userController.updateUser({ params: { id: "1" }, user: { id: "1" }, body: {} }, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  test("returns 403 and does not update another user", async () => {
+    const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+    const res = mockRes();
+
+    await userController.updateUser(
+      { params: { id: "2" }, user: { id: "1" }, body: { fullName: "Hacked" } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(updateSpy).not.toHaveBeenCalled();
   });
 });
 
@@ -193,7 +234,7 @@ describe("deleteUser", () => {
     jest.spyOn(User, "findByIdAndDelete").mockResolvedValue({ _id: "1" });
     const res = mockRes();
 
-    await userController.deleteUser({ params: { id: "1" } }, res);
+    await userController.deleteUser({ params: { id: "1" }, user: { id: "1" } }, res);
 
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.end).toHaveBeenCalled();
@@ -203,8 +244,18 @@ describe("deleteUser", () => {
     jest.spyOn(User, "findByIdAndDelete").mockResolvedValue(null);
     const res = mockRes();
 
-    await userController.deleteUser({ params: { id: "1" } }, res);
+    await userController.deleteUser({ params: { id: "1" }, user: { id: "1" } }, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  test("returns 403 and does not delete another user", async () => {
+    const deleteSpy = jest.spyOn(User, "findByIdAndDelete");
+    const res = mockRes();
+
+    await userController.deleteUser({ params: { id: "2" }, user: { id: "1" } }, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(deleteSpy).not.toHaveBeenCalled();
   });
 });

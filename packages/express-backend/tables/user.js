@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: [100, "Name is too long"],
     },
     email: {
       type: String,
@@ -13,12 +14,21 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      maxlength: [254, "Email is too long"],
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
     },
     passwordHash: {
       type: String,
-      required: true,
+      // people who sign in with Google have no password
+      required: function () {
+        return !this.googleId;
+      },
       select: false,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
   },
   {

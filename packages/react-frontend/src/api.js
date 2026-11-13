@@ -1,13 +1,23 @@
 // One function per backend route. Names match the controller functions in express-backend.
 import { API_URL } from "./config";
-import { logOut } from "./auth";
+import { getToken, logOut } from "./auth";
+
 
 // Sends a request and returns the JSON. Throws the backend's error message if it fails.
 async function request(path, options = {}) {
+  const token = getToken();
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
   });
+
+  if (res.status === 401 && token) {
+    logOut();
+    window.location.href = "/Login";
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -35,6 +45,10 @@ export function createUser(user) {
 
 export function loginUser(email, password) {
   return request("/users/login", { method: "POST", body: JSON.stringify({ email, password }) });
+}
+
+export function googleLogin(idToken) {
+  return request("/users/google", { method: "POST", body: JSON.stringify({ idToken }) });
 }
 
 // ---------- Restaurants (restaurant-routes.js) ----------

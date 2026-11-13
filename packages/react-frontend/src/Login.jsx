@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { loginUser } from "./api";
 import { saveCurrentUser } from "./auth";
+import GoogleButton from "./GoogleButton";
 import "./Auth.css";
 
 function Login() {
@@ -38,12 +39,13 @@ function Login() {
       <form className="auth-card" onSubmit={handleSubmit}>
         <h1>SLO Foods</h1>
 
-        <label htmlFor="email">Cal Poly Email:</label>
+        <label htmlFor="email">Email:</label>
         <input
           type="email"
           id="email"
+          maxLength={254}
           name="email"
-          placeholder="yourname@calpoly.edu"
+          placeholder="you@example.com"
           value={form.email}
           onChange={handleChange}
         />
@@ -52,6 +54,7 @@ function Login() {
         <input
           type="password"
           id="password"
+          maxLength={72}
           name="password"
           placeholder="Example"
           value={form.password}
@@ -80,6 +83,10 @@ function Login() {
         <a className="auth-btn auth-btn-gray" href="/Signup">
           Sign Up
         </a>
+
+        <p className="auth-or">Or</p>
+
+        <GoogleButton onError={setError} />
       </form>
     </div>
   );
