@@ -1,5 +1,6 @@
 import React from "react";
 import "./RestaurantCard.css";
+import OpenNowBadge from "./OpenNowBadge";
 
 
 function Stars(props) {
@@ -43,6 +44,7 @@ function RestaurantCard({ restaurant, onClick }) {
     address,
     rating = 4.5,
     cuisine,
+    openingHours,
   } = restaurant;
 
   return (
@@ -80,6 +82,7 @@ function RestaurantCard({ restaurant, onClick }) {
           <span className="rating-score" style={{ marginLeft: "6px" }}>
             {rating.toFixed(1)}
           </span>
+          <OpenNowBadge openingHours={openingHours} />
         </div>
 
         <p className="restaurant-description">

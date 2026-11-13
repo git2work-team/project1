@@ -16,6 +16,7 @@ const FIELD_MASK = [
   "places.primaryType",
   "places.primaryTypeDisplayName",
   "places.types",
+  "places.regularOpeningHours",
   "nextPageToken",
 ].join(",");
 
@@ -134,6 +135,15 @@ async function saveRestaurant(place) {
   if (cuisine) {
     update.cuisine = cuisine.cuisine;
     update.cuisineLabel = cuisine.cuisineLabel;
+  }
+
+  //weekly hours: periods for the Open now badge, weekdayDescriptions are readable text like "Monday: 9:00 AM – 5:00 PM"
+  const openingHours = place.regularOpeningHours;
+  if (openingHours?.periods) {
+    update.openingHours = openingHours.periods;
+  }
+  if (openingHours?.weekdayDescriptions) {
+    update.hours = openingHours.weekdayDescriptions.join("\n");
   }
 
   //filters place.types to only have the ones not in GENERIC_TYPES
