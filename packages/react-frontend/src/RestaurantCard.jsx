@@ -42,7 +42,7 @@ function RestaurantCard({ restaurant, onClick }) {
     description,
     address,
     rating = 4.5,
-    cuisineLabel,
+    cuisine,
   } = restaurant;
 
   return (
@@ -69,8 +69,8 @@ function RestaurantCard({ restaurant, onClick }) {
       <div className="card-info">
         <div className="card-header">
           <h3 className="restaurant-name">{name}</h3>
-          {cuisineLabel && (
-            <span className="cuisine-badge">{cuisineLabel}</span>
+          {cuisine && (
+            <span className="cuisine-badge">{cuisine}</span>
           )}
         </div>
 
