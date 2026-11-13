@@ -40,7 +40,11 @@ export function getRestaurants(filters = {}) {
     queryParams.append("search", filters.search);
   }
   if (filters.cuisine) {
-    queryParams.append("cuisine", filters.cuisine);
+    if (Array.isArray(filters.cuisine) && filters.cuisine.length > 0) {
+      queryParams.append("cuisine", filters.cuisine.join(","));
+    } else if (typeof filters.cuisine === "string" && filters.cuisine.trim() !== "") {
+      queryParams.append("cuisine", filters.cuisine);
+    }
   }
 
   const queryString = queryParams.toString();
@@ -48,6 +52,11 @@ export function getRestaurants(filters = {}) {
 
   return request(path);
 }
+
+export function getCuisines() {
+  return request("/restaurants/cuisines");
+}
+
 
 // ---------- Reviews (review-routes.js) ----------
 
