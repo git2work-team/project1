@@ -331,7 +331,8 @@ function RestaurantPage(props) {
 
           return (
             <div key={review._id} className="reviewItem">
-              <p className="reviewUser">{review.userId?.fullName}</p>
+              {/* userId is null when the user who wrote the review was deleted */}
+              <p className="reviewUser">{review.userId?.fullName || "Deleted user"}</p>
               <div className="reviewRatingDate">
                 <Stars rating={review.rating} size="26px" />
                 <span className="reviewDate">
