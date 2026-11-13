@@ -19,8 +19,16 @@ const UserSchema = new mongoose.Schema(
     },
     passwordHash: {
       type: String,
-      required: true,
+      // people who sign in with Google have no password
+      required: function () {
+        return !this.googleId;
+      },
       select: false,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
   },
   {

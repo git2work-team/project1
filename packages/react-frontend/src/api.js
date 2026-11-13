@@ -41,6 +41,10 @@ export function loginUser(email, password) {
   return request("/users/login", { method: "POST", body: JSON.stringify({ email, password }) });
 }
 
+export function googleLogin(idToken) {
+  return request("/users/google", { method: "POST", body: JSON.stringify({ idToken }) });
+}
+
 // ---------- Restaurants (restaurant-routes.js) ----------
 
 export function getRestaurants(filters = {}) {

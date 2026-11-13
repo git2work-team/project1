@@ -11,7 +11,10 @@
     "test:comp": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "jest": {
-    "testEnvironment": "jest-environment-jsdom"
+    "testEnvironment": "jest-environment-jsdom",
+    "extensionsToTreatAsEsm": [
+      ".jsx"
+    ]
   },
   "babel": {
     "presets": [

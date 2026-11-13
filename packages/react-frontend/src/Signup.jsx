@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createUser } from "./api";
 import { saveCurrentUser } from "./auth";
+import GoogleButton from "./GoogleButton";
 import "./Auth.css";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -63,13 +64,13 @@ function Signup() {
           onChange={handleChange}
         />
 
-        <label htmlFor="email">Cal Poly Email:</label>
+        <label htmlFor="email">Email:</label>
         <input
           type="email"
           id="email"
           maxLength={254}
           name="email"
-          placeholder="yourname@calpoly.edu"
+          placeholder="you@example.com"
           value={form.email}
           onChange={handleChange}
         />
@@ -101,6 +102,10 @@ function Signup() {
         <button type="submit" className="auth-btn auth-btn-blue" disabled={loading}>
           {loading ? "Signing up..." : "Sign Up"}
         </button>
+
+        <p className="auth-or">Or</p>
+
+        <GoogleButton onError={setError} />
       </form>
     </div>
   );
