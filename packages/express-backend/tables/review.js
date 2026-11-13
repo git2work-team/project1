@@ -27,12 +27,27 @@ const ReviewSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    votes: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        vote: {
+          type: Number,
+          enum: [-1, 1],
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );
 
 ReviewSchema.index({ restaurantId: 1, createdAt: -1 });
 ReviewSchema.index({ userId: 1, createdAt: -1 });
+// One review per user per restaurant
+ReviewSchema.index({ userId: 1, restaurantId: 1 }, { unique: true });
 
 const Review = mongoose.model("Review", ReviewSchema);
 

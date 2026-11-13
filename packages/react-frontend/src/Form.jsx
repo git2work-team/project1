@@ -53,7 +53,7 @@ function Form(props) {
         value={description}
         onChange={(event) => setDescription(event.target.value)}
       />
-      <label htmlFor="photo">Add a photo</label>
+      <label htmlFor="photo">Add photos</label>
       {/* user can select multiple photos to upload */}
       <input
         id="photo"

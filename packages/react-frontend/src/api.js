@@ -121,3 +121,10 @@ export async function uploadReviewPhoto(reviewId, file) {
     }),
   });
 }
+
+export function voteReview(reviewId, userId, vote) {
+  return request(`/reviews/${reviewId}/vote`, {
+    method: "PUT",
+    body: JSON.stringify({ userId, vote }),
+  });
+}
