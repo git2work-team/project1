@@ -1,8 +1,8 @@
 import { jest, describe, test, expect, afterEach } from "@jest/globals";
-import User from "../tables/user.js";
-import googleAuth from "../google-auth.js";
-import userController from "../controllers/user-controller.js";
-import { mockRes } from "./helper/mock-res.js";
+import User from "../../tables/user.js";
+import googleAuth from "../../google-auth.js";
+import userController from "../../controllers/user-controller.js";
+import { mockRes } from "../helper/mock-res.js";
 
 process.env.JWT_SECRET = "test-secret";
 

@@ -1,7 +1,7 @@
 import { jest, describe, test, expect, afterEach } from "@jest/globals";
-import Restaurant from "../tables/restaurant.js";
-import restaurantController from "../controllers/restaurant-controller.js";
-import { mockRes } from "./helper/mock-res.js";
+import Restaurant from "../../tables/restaurant.js";
+import restaurantController from "../../controllers/restaurant-controller.js";
+import { mockRes } from "../helper/mock-res.js";
 
 afterEach(() => {
   jest.restoreAllMocks();
