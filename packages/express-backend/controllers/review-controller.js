@@ -2,7 +2,6 @@ import Review from "../tables/review.js";
 import ReviewPhoto from "../tables/review-photo.js";
 import Restaurant from "../tables/restaurant.js";
 import User from "../tables/user.js";
-import e from "cors";
 
 async function getReviews(req, res) {
   const { restaurantId, userId } = req.query;

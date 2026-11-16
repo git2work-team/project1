@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Table from "./Table";
-import Form from "./Form";
-import WantToTry from "./WantToTry";
-import Review from "./Review";
 
 import "./Navbar.css";
 import { getCurrentUser, logOut } from "./auth";

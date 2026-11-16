@@ -16,5 +16,12 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  {
+    files: ["**/tests/**/*.js", "**/*.test.js"],
+    languageOptions: {
+      globals: globals.jest,
+    },
+  },
   pluginReact.configs.flat.recommended,
+  { settings: { react: { version: "detect" } } },
 ]);

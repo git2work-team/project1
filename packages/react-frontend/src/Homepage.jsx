@@ -7,12 +7,10 @@ const SLIDES_TEXT = [
   "Find out what you like",
   "Discover top rated spots in SLO",
   "Save your favorite restaurants",
-  "Share your dining reviews"
+  "Share your dining reviews",
 ];
 
-
 function Homepage(props) {
-  
   const [currentSlide, setCurrentSlide] = useState(0);
   const [restaurants, setRestaurants] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,10 +20,8 @@ function Homepage(props) {
     getRestaurants()
       .then((data) => {
         // get the top four
-        const sortedTopFour = data
-          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-          .slice(0, 4);
-        
+        const sortedTopFour = data.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 4);
+
         setRestaurants(sortedTopFour);
       })
       .catch((error) => console.log("Error fetching top restaurants:", error.message));
@@ -35,10 +31,15 @@ function Homepage(props) {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
-    if(props.onSearch) {
+    if (props.onSearch) {
       props.onSearch(searchQuery);
     }
-  }
+  };
+
+  const handleNextSlide = () => {
+    if (restaurants.length === 0) return;
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % restaurants.length);
+  };
 
   // auto-rotate slides
   useEffect(() => {
@@ -51,18 +52,10 @@ function Homepage(props) {
     return () => clearInterval(timer);
   }, [currentSlide, restaurants.length]);
 
-  const handleNextSlide = () => {
-    if (restaurants.length === 0) return;
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % restaurants.length);
-  };
-
   const handlePrevSlide = () => {
     if (restaurants.length === 0) return;
-    setCurrentSlide((prevSlide) =>
-      prevSlide === 0 ? restaurants.length - 1 : prevSlide - 1
-    );
+    setCurrentSlide((prevSlide) => (prevSlide === 0 ? restaurants.length - 1 : prevSlide - 1));
   };
-
 
   //if data is still loading
   if (restaurants.length === 0) {
@@ -71,7 +64,12 @@ function Homepage(props) {
         <div className="search-section">
           <div className="search-input-wrapper">
             <span className="search-icon"></span>
-            <input type="text" className="search-input" placeholder="Search restaurants, cuisines..." disabled />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search restaurants, cuisines..."
+              disabled
+            />
           </div>
         </div>
         <div style={{ textAlign: "center", padding: "50px", color: "#00000" }}>
@@ -86,7 +84,6 @@ function Homepage(props) {
 
   return (
     <div className="homepage-container">
-      
       <div className="search-section">
         <form onSubmit={handleSearchSubmit} className="search-input-wrapper">
           <span className="search-icon"></span>
@@ -119,16 +116,14 @@ function Homepage(props) {
           </div>
         </div>
 
-        
         <div className="banner-right-box">
           <div className="card-display-area">
-            <RestaurantCard 
-              restaurant={currentRestaurant} 
-              onClick={() => props.openRestaurant(currentRestaurant)} 
+            <RestaurantCard
+              restaurant={currentRestaurant}
+              onClick={() => props.openRestaurant(currentRestaurant)}
             />
           </div>
 
-          
           <div className="bottom-controls-bar">
             <button
               onClick={handlePrevSlide}
@@ -148,11 +143,7 @@ function Homepage(props) {
               ))}
             </div>
 
-            <button
-              onClick={handleNextSlide}
-              className="arrow-btn-small"
-              aria-label="Next spot"
-            >
+            <button onClick={handleNextSlide} className="arrow-btn-small" aria-label="Next spot">
               ›
             </button>
           </div>

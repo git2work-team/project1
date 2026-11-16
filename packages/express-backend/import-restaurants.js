@@ -5,7 +5,7 @@ import Restaurant from "./tables/restaurant.js";
 const SEARCH_URL = "https://places.googleapis.com/v1/places:searchText";
 
 //might change to getting every restaurant in the nearby vicinity
-const NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
+// const NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
 
 //Ask google for what we care about
 const FIELD_MASK = [

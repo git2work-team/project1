@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { getCurrentUser } from "./auth.js";
 import { getSavedRestaurants, unsaveRestaurant } from "./api.js";
 import "./WantToTry.css";
-import RestaurantPage from "./RestaurantPage.jsx";
 
 const deals = [
   "Woodstock's Pizza - deal of the week",
@@ -47,7 +46,7 @@ function SpotCard(props) {
 function WantToTry(props) {
   const [spots, setSpots] = useState([]);
   const [filter, setFilter] = useState("All");
-  const [error, setError] = useState("");
+  const [, setError] = useState("");
   const user = getCurrentUser();
   useEffect(() => {
     if (!user) {

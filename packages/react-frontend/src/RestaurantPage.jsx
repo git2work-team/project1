@@ -116,7 +116,7 @@ function summarizeReviews(reviews) {
 function RestaurantPage(props) {
   const [reviews, setReviews] = useState([]);
   const [voting, setVoting] = useState(false);
-  const [voteError, setVoteError] = useState("");
+  const [, setVoteError] = useState("");
   useEffect(() => {
     if (!props.selectedRestaurant._id) {
       return;

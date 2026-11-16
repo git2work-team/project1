@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=react-frontend",
     "build": "npm run build --workspace=react-frontend",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm test -w express-backend",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

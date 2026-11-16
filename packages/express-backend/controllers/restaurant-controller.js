@@ -83,7 +83,7 @@ async function getRestaurants(req, res) {
 async function getCuisines(req, res) {
   try {
     const cuisines = await Restaurant.distinct("cuisine", { 
-      cuisine: { $ne: null, $ne: "" } 
+      cuisine: { $nin: [null, ""] } 
     });
 
     const validCuisines = cuisines

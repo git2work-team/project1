@@ -180,7 +180,7 @@ describe("getRestaurants - Search and Filters", () => {
     await restaurantController.getCuisines({}, res);
 
     expect(Restaurant.distinct).toHaveBeenCalledWith("cuisine", {
-      cuisine: { $ne: null, $ne: "" },
+      cuisine: { $nin: [null, ""] },
     });
     
     expect(res.json).toHaveBeenCalled();
