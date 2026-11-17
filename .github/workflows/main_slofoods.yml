@@ -23,17 +23,23 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: npm install, build, and test
+      # run the backend tests from the root, since jest is installed there
+      - name: npm install and test
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm ci
+          npm test -w express-backend
 
+      # install only the backend's packages inside its own folder, so the deployed app has them
+      - name: Install backend packages for deployment
+        run: npm install --workspaces=false --omit=dev
+        working-directory: packages/express-backend
+
+      # deploy only the backend folder, which has "start": "node backend.js"
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: packages/express-backend
 
   deploy:
     runs-on: ubuntu-latest
