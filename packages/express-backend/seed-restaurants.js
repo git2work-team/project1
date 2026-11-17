@@ -156,8 +156,9 @@ const restaurants = [
 ];
 
 async function seedRestaurants() {
-  const url = "http://localhost:8000/restaurants";
-
+  //const url = "http://localhost:8000/restaurants";
+  const url = "https://slofoods-d4gbfph3eaczcegh.belgiumcentral-01.azurewebsites.net/restaurants";
+  
   // Load restaurants already saved in the database.
   const existingResponse = await fetch(url);
 
