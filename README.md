@@ -1,3 +1,29 @@
+# SLOFoods
+
+[![CI Testing](https://github.com/git2work-team/project1/actions/workflows/ci-testing.yml/badge.svg)](https://github.com/git2work-team/project1/actions/workflows/ci-testing.yml)
+[![Deploy to Azure](https://github.com/git2work-team/project1/actions/workflows/main_slofoods.yml/badge.svg)](https://github.com/git2work-team/project1/actions/workflows/main_slofoods.yml)
+
+SLOFoods is a web app for Cal Poly students to find restaurants on and off campus, read and write reviews with photos, and save places they want to try.
+
+## Deployed App
+
+- Frontend: https://slofoods-frontend-c6h7bnaccbe8g4hx.belgiumcentral-01.azurewebsites.net
+- Backend API: https://slofoods-d4gbfph3eaczcegh.belgiumcentral-01.azurewebsites.net
+
+## CI/CD
+
+- **CI Testing** (`.github/workflows/ci-testing.yml`) runs on every push to `main`. It installs dependencies with `npm ci`, lints the backend and frontend, builds the frontend, and runs the backend tests.
+- **Deploy to Azure** (`.github/workflows/main_slofoods.yml`) runs on every push to `main`. It runs the backend tests, then deploys only the `packages/express-backend` folder to an Azure Web App.
+- **Deploy frontend** (`.github/workflows/frontend_slofoods.yml`) runs on every push to `main`. It builds `packages/react-frontend` and deploys the `dist` folder to a second Azure Web App, which serves it with `pm2 serve`. (Azure Static Web Apps are not available in the regions our student subscriptions allow.) Production builds read the backend URL from `packages/react-frontend/.env.production`, and `npm run dev` uses `http://localhost:8000`.
+
+## Running Locally
+
+1. Install dependencies from the project root: `npm install`
+2. Create `packages/express-backend/.env` with `MONGODB_URI`, `JWT_SECRET` (at least 32 characters), `GOOGLE_CLIENT_ID`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`. Never commit this file.
+3. Start the backend: `npm run dev -w express-backend` (port 8000)
+4. Start the frontend: `npm run dev` (port 5173)
+5. Run the backend tests: `npm test -w express-backend`
+
 ## Figma Storyboard Link
 
 https://www.figma.com/design/r69OzTUJHwbV4n88coYpSb/3100-Project?node-id=0-1&t=N1Dm5d8RDRSwiGb0-1
