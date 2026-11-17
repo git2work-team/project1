@@ -1,0 +1,33 @@
+name: Build and deploy React frontend to Azure Web App - slofoods-frontend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+
+      # vite build reads VITE_API_URL from packages/react-frontend/.env.production
+      - name: Install and build the frontend
+        run: |
+          npm ci
+          npm run build -w react-frontend
+
+      # deploy only the built files in dist, Azure serves them with the startup command
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "slofoods-frontend"
+          publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
+          package: packages/react-frontend/dist
