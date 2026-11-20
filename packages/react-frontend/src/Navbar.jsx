@@ -61,9 +61,12 @@ function Navbar() {
           {isOpen && (
             <div className="profile-panel">
               {user ? (
-                <a href="/" onClick={handleLogOut}>
-                  Log out ({user.fullName})
-                </a>
+                <>
+                  <a href="/" onClick={handleLogOut}>
+                    Log out ({user.fullName})
+                  </a>
+                  <a href="/Settings">Settings</a>
+                </>
               ) : (
                 <a href="/Login">Log in</a>
               )}
