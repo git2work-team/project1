@@ -7,6 +7,7 @@ import RestaurantPage from "./RestaurantPage.jsx";
 import Browse from "./Browse";
 import Login from "./Login";
 import Signup from "./Signup";
+import Settings from "./Settings";
 import { getCurrentUser } from "./auth.js";
 
 function MyApp() {
@@ -56,6 +57,9 @@ function MyApp() {
       break;
     case "/Signup":
       content = <Signup />;
+      break;
+    case "/Settings":
+      content = <Settings />;
       break;
   }
 

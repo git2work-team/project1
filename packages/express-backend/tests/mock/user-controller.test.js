@@ -1,4 +1,4 @@
-import { jest, describe, test, expect, afterEach } from "@jest/globals";
+import { jest, describe, test, expect, beforeEach, afterEach } from "@jest/globals";
 import bcrypt from "bcryptjs";
 import User from "../../tables/user.js";
 import userController from "../../controllers/user-controller.js";
@@ -204,6 +204,161 @@ describe("updateUser", () => {
       { new: true, runValidators: true }
     );
     expect(res.json).toHaveBeenCalledWith({ _id: "1", fullName: "B" });
+  });
+
+  test("only changes the fields that were sent", async () => {
+    jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue({ _id: "1" });
+    const req = { params: { id: "1" }, user: { id: "1" }, body: { bio: "Hi" } };
+
+    await userController.updateUser(req, mockRes());
+
+    expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+      "1",
+      { bio: "Hi" },
+      { new: true, runValidators: true }
+    );
+  });
+
+  test("trims the lists and drops empty items", async () => {
+    jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue({ _id: "1" });
+    const req = {
+      params: { id: "1" },
+      user: { id: "1" },
+      body: { allergies: [" peanuts ", ""], dislikedFoods: ["  ", "pork"] },
+    };
+
+    await userController.updateUser(req, mockRes());
+
+    expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+      "1",
+      { allergies: ["peanuts"], dislikedFoods: ["pork"] },
+      { new: true, runValidators: true }
+    );
+  });
+
+  test("returns 400 when a list is not a list of text", async () => {
+    const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+    const res = mockRes();
+
+    await userController.updateUser(
+      { params: { id: "1" }, user: { id: "1" }, body: { allergies: "peanuts" } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  test("returns 400 when the bio is not text", async () => {
+    const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+    const res = mockRes();
+
+    await userController.updateUser(
+      { params: { id: "1" }, user: { id: "1" }, body: { bio: { $gt: "" } } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  describe("profile photo", () => {
+    const originalCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+    beforeEach(() => {
+      process.env.CLOUDINARY_CLOUD_NAME = "mycloud";
+    });
+
+    afterEach(() => {
+      process.env.CLOUDINARY_CLOUD_NAME = originalCloudName;
+    });
+
+    test("saves a photo from the user's own folder and works out the id from the URL", async () => {
+      jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue({ _id: "1" });
+      const url = "https://res.cloudinary.com/mycloud/image/upload/v123/profile-photos/1/me.jpg";
+      const req = {
+        params: { id: "1" },
+        user: { id: "1" },
+        // an id sent by the client is ignored
+        body: { profileImageUrl: url, profileImagePublicId: "someone-elses/photo" },
+      };
+
+      await userController.updateUser(req, mockRes());
+
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        "1",
+        { profileImageUrl: url, profileImagePublicId: "profile-photos/1/me" },
+        { new: true, runValidators: true }
+      );
+    });
+
+    test("rejects a photo in another user's folder or another folder", async () => {
+      const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+      const base = "https://res.cloudinary.com/mycloud/image/upload/";
+      const urls = [
+        `${base}profile-photos/2/me.jpg`,
+        `${base}review-photos/abc.jpg`,
+        `${base}profile-photos/1/../2/me.jpg`,
+        `${base}profile-photos/1/`,
+      ];
+
+      for (const profileImageUrl of urls) {
+        const res = mockRes();
+        await userController.updateUser(
+          { params: { id: "1" }, user: { id: "1" }, body: { profileImageUrl } },
+          res
+        );
+        expect(res.status).toHaveBeenCalledWith(400);
+      }
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    test("rejects a photo from another website", async () => {
+      const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+      const res = mockRes();
+
+      await userController.updateUser(
+        {
+          params: { id: "1" },
+          user: { id: "1" },
+          body: { profileImageUrl: "https://evil.example.com/me.jpg" },
+        },
+        res
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    test("rejects another Cloudinary account that starts with the same name", async () => {
+      const updateSpy = jest.spyOn(User, "findByIdAndUpdate");
+      const res = mockRes();
+
+      await userController.updateUser(
+        {
+          params: { id: "1" },
+          user: { id: "1" },
+          body: { profileImageUrl: "https://res.cloudinary.com/mycloud-other/image/upload/a.jpg" },
+        },
+        res
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    test("null removes the photo and its id", async () => {
+      jest.spyOn(User, "findByIdAndUpdate").mockResolvedValue({ _id: "1" });
+      const req = { params: { id: "1" }, user: { id: "1" }, body: { profileImageUrl: null } };
+
+      await userController.updateUser(req, mockRes());
+
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        "1",
+        { profileImageUrl: null, profileImagePublicId: null },
+        { new: true, runValidators: true }
+      );
+    });
   });
 
   test("returns 404 when the user does not exist", async () => {

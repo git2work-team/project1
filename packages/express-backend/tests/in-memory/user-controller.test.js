@@ -113,6 +113,79 @@ describe("updateUser", () => {
     expect(updated.fullName).toBe("B");
   });
 
+  test("a new user starts with empty profile fields", async () => {
+    const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
+
+    expect(user.bio).toBe("");
+    expect(user.allergies).toEqual([]);
+    expect(user.dislikedFoods).toEqual([]);
+    expect(user.profileImageUrl).toBeNull();
+  });
+
+  test("saves the profile fields and leaves the name alone", async () => {
+    const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
+    const id = user._id.toString();
+    const res = mockRes();
+
+    await userController.updateUser(
+      {
+        params: { id },
+        user: { id },
+        body: { bio: " Loves tacos ", allergies: ["peanuts", " "], dislikedFoods: ["pork"] },
+      },
+      res
+    );
+
+    const updated = await User.findById(id);
+    expect(updated.fullName).toBe("A");
+    expect(updated.bio).toBe("Loves tacos");
+    expect(updated.allergies).toEqual(["peanuts"]);
+    expect(updated.dislikedFoods).toEqual(["pork"]);
+  });
+
+  test("returns 400 when the bio is too long", async () => {
+    const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
+    const id = user._id.toString();
+    const res = mockRes();
+
+    await userController.updateUser(
+      { params: { id }, user: { id }, body: { bio: "a".repeat(501) } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect((await User.findById(id)).bio).toBe("");
+  });
+
+  test("returns 400 when there are too many allergies", async () => {
+    const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
+    const id = user._id.toString();
+    const res = mockRes();
+    const tooMany = Array.from({ length: 21 }, (_, i) => `food${i}`);
+
+    await userController.updateUser(
+      { params: { id }, user: { id }, body: { allergies: tooMany } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect((await User.findById(id)).allergies).toEqual([]);
+  });
+
+  test("never changes the password hash or Google id", async () => {
+    const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
+    const id = user._id.toString();
+
+    await userController.updateUser(
+      { params: { id }, user: { id }, body: { passwordHash: "hacked", googleId: "123", bio: "x" } },
+      mockRes()
+    );
+
+    const saved = await User.findById(id).select("+passwordHash");
+    expect(saved.passwordHash).toBe("hash");
+    expect(saved.googleId).toBeUndefined();
+  });
+
   test("returns 403 when updating someone else", async () => {
     const user = await User.create({ fullName: "A", email: "a@b.com", passwordHash: "hash" });
     const res = mockRes();
