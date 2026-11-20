@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from "react";
 
 import "./Navbar.css";
-import { getCurrentUser, logOut } from "./auth";
+import { getCurrentUser, logOut, USER_CHANGED_EVENT } from "./auth";
 import { getUserById } from "./api";
 
 function Navbar() {
-  const user = getCurrentUser();
+  const [user, setUser] = useState(getCurrentUser);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Show the new name right away when it is changed on the settings page
+  useEffect(() => {
+    function refreshUser() {
+      setUser(getCurrentUser());
+    }
+    window.addEventListener(USER_CHANGED_EVENT, refreshUser);
+    return () => window.removeEventListener(USER_CHANGED_EVENT, refreshUser);
+  }, []);
 
   // Check the saved user still exists. If they were deleted, api.js logs them out.
   useEffect(() => {

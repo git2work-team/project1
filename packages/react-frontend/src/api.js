@@ -39,6 +39,11 @@ export function getUserById(id) {
   return request(`/users/${id}`);
 }
 
+// Changes the logged in user's own profile. Send only the fields that should change.
+export function updateUser(id, fields) {
+  return request(`/users/${id}`, { method: "PATCH", body: JSON.stringify(fields) });
+}
+
 export function createUser(user) {
   return request("/users", { method: "POST", body: JSON.stringify(user) });
 }

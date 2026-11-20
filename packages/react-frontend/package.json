@@ -12,6 +12,9 @@
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom",
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/tests/style-stub.js"
+    },
     "extensionsToTreatAsEsm": [
       ".jsx"
     ]
