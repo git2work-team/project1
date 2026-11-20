@@ -30,6 +30,37 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    // everything below is optional, so older accounts and new signups work without it
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Bio is too long"],
+      default: "",
+    },
+    allergies: {
+      type: [{ type: String, trim: true, maxlength: [50, "An allergy is too long"] }],
+      validate: [(list) => list.length <= 20, "Too many allergies"],
+      default: [],
+    },
+    dislikedFoods: {
+      type: [{ type: String, trim: true, maxlength: [50, "A food name is too long"] }],
+      validate: [(list) => list.length <= 20, "Too many foods"],
+      default: [],
+    },
+    // Cloudinary photo. null means the person has no profile photo.
+    profileImageUrl: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Image link is too long"],
+      default: null,
+    },
+    // Cloudinary's id for the photo, so the old one can be deleted when it is replaced
+    profileImagePublicId: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Image id is too long"],
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: false },
